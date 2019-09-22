@@ -80,7 +80,7 @@ _note: All input text should be UTF-8 encoded._
 ## Run example
 make sure you have **python3**, python2.X won't work correctly.
 
-just `sh run.sh` in project root, and compare 
+just `sh run.sh` in project root, and compare raw text and normalized text.
 
 ## possible future work
 Since TN is a typical "done is better than perfect" module in context of ASR, and the current state is sufficient for my purpose, I probably won't update this repo frequently.
