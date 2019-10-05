@@ -1,6 +1,6 @@
 import 'byte.grm' as b;
-import 'numbers.grm' as numbers;
+import 'number.grm' as number;
 import 'hotfix.grm' as hotfix;
 
-export ITN = Optimize[numbers.NUMBERS_REWRITE_RULE @ hotfix.HOTFIX];
+export ITN = Optimize[number.NUMBER @ hotfix.HOTFIX];
 
