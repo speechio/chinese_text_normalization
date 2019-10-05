@@ -1,0 +1,5 @@
+import 'byte.grm' as b;
+import 'numbers.grm' as numbers;
+
+export ITN = Optimize[numbers.NUMBERS_REWRITE_RULE];
+

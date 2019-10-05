@@ -1,0 +1,61 @@
+import 'byte.grm' as b;
+
+numbers_1_to_9 = (
+  ("一":"1") | ("幺":"1") |
+  ("二":"2") | ("两":"2") |
+  ("三":"3") |
+  ("四":"4") |
+  ("五":"5") |
+  ("六":"6") |
+  ("七":"7") |
+  ("八":"8") |
+  ("九":"9") 
+);
+
+numbers_0_to_9 = (("零":"0") | numbers_1_to_9);
+
+numbers_10_to_19 = (
+  ("十":"10") |
+  ("十一":"11") |
+  ("十二":"12") |
+  ("十三":"13") |
+  ("十四":"14") |
+  ("十五":"15") |
+  ("十六":"16") |
+  ("十七":"17") |
+  ("十八":"18") |
+  ("十九":"19") 
+);
+
+numbers_10s    = (numbers_1_to_9 ("十":""));
+numbers_100s   = (numbers_1_to_9 ("百":""));
+numbers_1000s  = (numbers_1_to_9 ("千":""));
+numbers_10000s = (numbers_1_to_9 ("万":""));
+
+numbers_10_to_99 = (
+  ((numbers_10s numbers_1_to_9)<-0.3>) | 
+  ((numbers_10s ("":"0"))<-0.2>) | 
+  (numbers_10_to_19 <-0.1>)
+);
+
+numbers_1_to_99 = (numbers_1_to_9 | numbers_10_to_99);
+
+numbers_100_to_999 = (
+  ((numbers_100s ("零":"0") numbers_1_to_9)<0.0>)|
+  ((numbers_100s numbers_10_to_99)<0.0>) |
+  ((numbers_100s numbers_1_to_9 ("":"0"))<0.0>) |
+  ((numbers_100s ("":"00"))<0.1>)
+);
+
+numbers_1000_to_9999 = (
+  ((numbers_1000s numbers_100_to_999)<0.0>) |
+  ((numbers_1000s ("零":"00") numbers_1_to_9)<0.0>)|
+  ((numbers_1000s ("零":"0") numbers_10_to_99)<0.0>)|
+  ((numbers_1000s numbers_1_to_9 ("":"00"))<0.0>) |
+  ((numbers_1000s ("":"000"))<1>)
+);
+
+numbers = numbers_1_to_99 | (numbers_100_to_999 <-1>) | (numbers_1000_to_9999 <-2>);
+
+export NUMBERS_REWRITE_RULE = CDRewrite[numbers, "", "", b.kBytes*];
+
