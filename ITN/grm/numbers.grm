@@ -49,10 +49,10 @@ numbers_100_to_999 = (
 
 numbers_1000_to_9999 = (
   ((numbers_1000s numbers_100_to_999)<0.0>) |
-  ((numbers_1000s ("零":"00") numbers_1_to_9)<0.0>)|
   ((numbers_1000s ("零":"0") numbers_10_to_99)<0.0>)|
-  ((numbers_1000s numbers_1_to_9 ("":"00"))<0.0>) |
-  ((numbers_1000s ("":"000"))<1>)
+  ((numbers_1000s ("零":"00") numbers_1_to_9)<0.0>)|
+  ((numbers_1000s ("":"000"))<1>) |
+  ((numbers_1000s numbers_1_to_9 ("":"00"))<0.0>)
 );
 
 numbers = numbers_1_to_99 | (numbers_100_to_999 <-1>) | (numbers_1000_to_9999 <-2>);
