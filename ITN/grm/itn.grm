@@ -1,6 +1,7 @@
 import 'byte.grm' as b;
 import 'number.grm' as number;
 import 'hotfix.grm' as hotfix;
+import 'percentage.grm' as percentage;
 
-export ITN = Optimize[number.NUMBER @ hotfix.HOTFIX];
+export ITN = Optimize[percentage.PERCENTAGE @ number.NUMBER @ hotfix.HOTFIX];
 

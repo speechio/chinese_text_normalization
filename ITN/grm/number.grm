@@ -38,7 +38,7 @@ number_10_to_99 = (
   (number_10_to_19 <-0.1>)
 );
 
-number_1_to_99 = (number_1_to_9 | number_10_to_99);
+export number_1_to_99 = (number_1_to_9 | number_10_to_99);
 
 number_100_to_999 = (
   ((number_100s ("零":"0") number_1_to_9)<0.0>)|

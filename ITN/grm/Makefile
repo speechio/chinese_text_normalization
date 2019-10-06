@@ -1,4 +1,4 @@
-itn.far: itn.grm byte.far number.far hotfix.far
+itn.far: itn.grm byte.far number.far hotfix.far percentage.far
 	thraxcompiler --input_grammar=$< --output_far=$@
 
 byte.far: byte.grm 
@@ -10,5 +10,8 @@ number.far: number.grm byte.far
 hotfix.far: hotfix.grm byte.far hotfix.list
 	thraxcompiler --input_grammar=$< --output_far=$@
 
+percentage.far: percentage.grm byte.far number.far
+	thraxcompiler --input_grammar=$< --output_far=$@
+
 clean:
-	rm -f byte.far number.far hotfix.far
+	rm -f byte.far number.far hotfix.far percentage.far
