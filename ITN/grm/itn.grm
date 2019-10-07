@@ -2,6 +2,7 @@ import 'byte.grm' as b;
 import 'number.grm' as number;
 import 'hotfix.grm' as hotfix;
 import 'percentage.grm' as percentage;
+import 'date.grm' as date;
 
-export ITN = Optimize[percentage.PERCENTAGE @ number.NUMBER @ hotfix.HOTFIX];
+export ITN = Optimize[percentage.PERCENTAGE @ (date.DATE <-1>) @ number.NUMBER @ hotfix.HOTFIX];
 

@@ -12,7 +12,7 @@ number_1_to_9 = (
   ("九":"9") 
 );
 
-number_0_to_9 = (("零":"0") | number_1_to_9);
+export number_0_to_9 = (("零":"0") | number_1_to_9);
 
 number_10_to_19 = (
   ("十":"10") |
@@ -55,7 +55,7 @@ number_1000_to_9999 = (
   ((number_1000s number_1_to_9 ("":"00"))<0.0>)
 );
 
-number = number_1_to_99 | (number_100_to_999 <-1>) | (number_1000_to_9999 <-2>);
+export number = number_1_to_99 | (number_100_to_999 <-1>) | (number_1000_to_9999 <-2>);
 
 export NUMBER = CDRewrite[number, "", "", b.kBytes*];
 
