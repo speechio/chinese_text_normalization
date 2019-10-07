@@ -81,11 +81,15 @@ _note: All input text should be UTF-8 encoded._
 
 ## Run examples
 * TN (python)
+
 make sure you have **python3**, python2.X won't work correctly.
+
 `sh run.sh` in `TN` dir, and compare raw text and normalized text.
 
 * ITN (thrax)
+
 make sure you  have **thrax** installed, and your PATH should be able to find thrax binaries.
+
 `sh run.sh` in `ITN` dir. check Makefile for grammar dependency.
 
 ## possible future work
