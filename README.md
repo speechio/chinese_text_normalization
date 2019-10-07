@@ -82,20 +82,21 @@ _note: All input text should be UTF-8 encoded._
 ## Run examples
 * TN (python)
 make sure you have **python3**, python2.X won't work correctly.
-just `sh run.sh` in `TN` dir, and compare raw text and normalized text.
+`sh run.sh` in `TN` dir, and compare raw text and normalized text.
 
 * ITN (thrax)
-refer Makefile in `ITN` dir
+make sure you  have **thrax** installed, and your PATH should be able to find thrax binaries.
+`sh run.sh` in `ITN` dir. check Makefile for grammar dependency.
 
 ## possible future work
 Since TN is a typical "done is better than perfect" module in context of ASR, and the current state is sufficient for my purpose, I probably won't update this repo frequently.
 
 there are indeed something that needs to be improved:
 
-* NSW normalizers in this project are based on regular expression, I've found some unintended matches, those pattern regexps need to be refined for more precise TN coverage.
+* For TN, NSW normalizers in TN dir are based on regular expression, I've found some unintended matches, those pattern regexps need to be refined for more precise TN coverage.
+
+* For ITN, extend those thrax rewriting grammars to cover more scenarios.
 
 * Further more, nowadays commercial systems start to introduce RNN-like models into TN, and a mix of (rule-based & model-based) system is state-of-the-art.  More readings about this, search Richard Sproat and KyleGorman's work at Google.
-
-* Current tool is implemented in python, and it is sufficient for offline processing.  But in the future, if I need to deal with ITN(Inverse Text Normalization), I may adapt these re-writing rules into *Thrax*, or use open-source framework such as *Google's SparrowHawk*, because ITN is part of ASR's runtime, efficiency matters.
 
 END
