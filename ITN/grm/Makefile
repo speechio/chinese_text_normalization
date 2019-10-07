@@ -1,4 +1,4 @@
-itn.far: itn.grm byte.far number.far hotfix.far percentage.far date.far
+itn.far: itn.grm byte.far number.far hotfix.far percentage.far date.far amount.far
 	thraxcompiler --input_grammar=$< --output_far=$@
 
 byte.far: byte.grm 
@@ -16,5 +16,8 @@ percentage.far: percentage.grm byte.far number.far
 date.far: date.grm byte.far number.far
 	thraxcompiler --input_grammar=$< --output_far=$@
 
+amount.far: amount.grm byte.far number.far
+	thraxcompiler --input_grammar=$< --output_far=$@
+
 clean:
-	rm -f byte.far number.far hotfix.far percentage.far date.far
+	rm -f byte.far number.far hotfix.far percentage.far date.far amount.far
