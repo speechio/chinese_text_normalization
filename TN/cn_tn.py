@@ -746,7 +746,12 @@ if __name__ == '__main__':
         key = ''
         text = ''
         if args.has_key:
-            key, text = l.split(maxsplit=1)
+            cols = l.split(maxsplit=1)
+            key = cols[0]
+            if len(cols) == 2:
+                text = cols[1]
+            else:
+                text = ''
         else:
             text = l
 
