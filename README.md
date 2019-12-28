@@ -1,16 +1,18 @@
 # Chinese Text Normalization for Speech Processing
 
 ## Problem
-Search "Text Normalization"(TN) on Google and Github, you can hardly find open-source projects that are "read-to-use" for text normalization tasks. Instead, you find a bunch of NLP toolkits or frameworks that *supports* TN functionality.  There is quite some work between "support text normalization" and "do text normalization".
+
+Search for "Text Normalization"(TN) on Google and Github, you can hardly find open-source projects that are "read-to-use" for text normalization tasks. Instead, you find a bunch of NLP toolkits or frameworks that *supports* TN functionality.  There is quite some work between "support text normalization" and "do text normalization".
 
 ## Reason
+
 * TN is language-dependent, more or less.
 
-    Some of TN processing methods are shared across languages, but a good TN module alway involves language-specific knowledge and treatments, more or less.
+    Some of TN processing methods are shared across languages, but a good TN module always involves language-specific knowledge and treatments, more or less.
 
 * TN is task-specific.
 
-    Even for same language, different applications require quite different TN.
+    Even for the same language, different applications require quite different TN.
 
 * TN is "dirty"
 
@@ -18,15 +20,17 @@ Search "Text Normalization"(TN) on Google and Github, you can hardly find open-s
 
 * mature TN module is an asset
 
-    since constructing and maintaining TN is hard, it is actually an asset for commercial companies, hence it is unlikely to find a product-level TN in open-source community (correct me if you find any)
+    Since constructing and maintaining TN is hard, it is actually an asset for commercial companies, hence it is unlikely to find a product-level TN in open-source community (correct me if you find any)
 
-* TN is a less important topic for both academic and commercials.
+* TN is a less important topic for either academic or commercials.
 
 ## Goal
-This project setups a ready-to-use TN module for **Chinese**. Since my background is **speech processing**, this project should be able to handle most common TN tasks, in **Chinese ASR** text processing pipelines.
+
+This project sets up a ready-to-use TN module for **Chinese**. Since my background is **speech processing**, this project should be able to handle most common TN tasks, in **Chinese ASR** text processing pipelines.
 
 ## Normalizers
-1. supported NSW(Non-Standard-Word) Normalization
+
+1. supported NSW (Non-Standard-Word) Normalization
 
     |NSW type|raw|normalized|
     |-|-|-|
@@ -80,6 +84,7 @@ This project setups a ready-to-use TN module for **Chinese**. Since my backgroun
 _note: All input text should be UTF-8 encoded._
 
 ## Run examples
+
 * TN (python)
 
 make sure you have **python3**, python2.X won't work correctly.
@@ -93,6 +98,7 @@ make sure you  have **thrax** installed, and your PATH should be able to find th
 `sh run.sh` in `ITN` dir. check Makefile for grammar dependency.
 
 ## possible future work
+
 Since TN is a typical "done is better than perfect" module in context of ASR, and the current state is sufficient for my purpose, I probably won't update this repo frequently.
 
 there are indeed something that needs to be improved:
@@ -101,6 +107,6 @@ there are indeed something that needs to be improved:
 
 * For ITN, extend those thrax rewriting grammars to cover more scenarios.
 
-* Further more, nowadays commercial systems start to introduce RNN-like models into TN, and a mix of (rule-based & model-based) system is state-of-the-art.  More readings about this, search Richard Sproat and KyleGorman's work at Google.
+* Further more, nowadays commercial systems start to introduce RNN-like models into TN, and a mix of (rule-based & model-based) system is state-of-the-art.  More readings about this, look for Richard Sproat and KyleGorman's work at Google.
 
 END
