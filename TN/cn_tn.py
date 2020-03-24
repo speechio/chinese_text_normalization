@@ -749,11 +749,11 @@ if __name__ == '__main__':
             cols = l.split(maxsplit=1)
             key = cols[0]
             if len(cols) == 2:
-                text = cols[1]
+                text = cols[1].strip()
             else:
                 text = ''
         else:
-            text = l
+            text = l.strip()
 
         # cases
         if args.to_upper and args.to_lower:
@@ -775,9 +775,9 @@ if __name__ == '__main__':
 
         # 
         if args.has_key:
-            ofile.write(key + '\t' + text)
+            ofile.write(key + '\t' + text + '\n')
         else:
-            ofile.write(text)
+            ofile.write(text + '\n')
         
         n += 1
         if n % args.log_interval == 0:
