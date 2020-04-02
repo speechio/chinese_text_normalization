@@ -735,7 +735,7 @@ if __name__ == '__main__':
     p.add_argument('--to_upper', action='store_true', help='convert to upper case')
     p.add_argument('--to_lower', action='store_true', help='convert to lower case')
     p.add_argument('--has_key', action='store_true', help="input text has Kaldi's key as first field.")
-    p.add_argument('--log_interval', type=int, default=10000, help='log interval in number of processed lines')
+    p.add_argument('--log_interval', type=int, default=100000, help='log interval in number of processed lines')
     args = p.parse_args()
 
     ifile = codecs.open(args.ifile, 'r', 'utf8')
