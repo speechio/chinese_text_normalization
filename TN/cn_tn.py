@@ -777,7 +777,8 @@ if __name__ == '__main__':
         if args.has_key:
             ofile.write(key + '\t' + text + '\n')
         else:
-            ofile.write(text + '\n')
+            if text.strip() != '': # skip empty line in pure text format(without Kaldi's utt key)
+                ofile.write(text + '\n')
         
         n += 1
         if n % args.log_interval == 0:
