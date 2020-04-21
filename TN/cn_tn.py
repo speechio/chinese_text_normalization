@@ -782,8 +782,10 @@ if __name__ == '__main__':
         n += 1
         if n % args.log_interval == 0:
             sys.stderr.write("text norm: {} lines done.\n".format(n))
+            sys.stderr.flush()
     
     sys.stderr.write("text norm: {} lines done in total.\n".format(n))
+    sys.stderr.flush()
     
     ifile.close()
     ofile.close()
