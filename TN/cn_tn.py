@@ -758,7 +758,7 @@ if __name__ == '__main__':
 
         # cases
         if args.to_upper and args.to_lower:
-            sys.stderr.write('text norm: to_upper OR to_lower?')
+            sys.stderr.write('cn_tn.py: to_upper OR to_lower?')
             exit(1)
         if args.to_upper:
             text = text.upper()
@@ -783,10 +783,10 @@ if __name__ == '__main__':
         
         n += 1
         if n % args.log_interval == 0:
-            sys.stderr.write("text norm: {} lines done.\n".format(n))
+            sys.stderr.write("cn_tn.py: {} lines done.\n".format(n))
             sys.stderr.flush()
     
-    sys.stderr.write("text norm: {} lines done in total.\n".format(n))
+    sys.stderr.write("cn_tn.py: {} lines done in total.\n".format(n))
     sys.stderr.flush()
     
     ifile.close()
