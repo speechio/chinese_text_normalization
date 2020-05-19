@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # coding=utf-8
-# Authors: 
+# Authors:
 #   2019.5 Zhiyang Zhou (https://github.com/Joee1995/chn_text_norm.git)
 #   2019.9 Jiayu DU
 #
@@ -49,7 +49,8 @@ COM_QUANTIFIERS = '(匹|张|座|回|场|尾|条|个|首|阙|阵|网|炮|顶|丘|
 # punctuation information are based on Zhon project (https://github.com/tsroten/zhon.git)
 CHINESE_PUNC_STOP = '！？｡。'
 CHINESE_PUNC_NON_STOP = '＂＃＄％＆＇（）＊＋，－／：；＜＝＞＠［＼］＾＿｀｛｜｝～｟｠｢｣､、〃《》「」『』【】〔〕〖〗〘〙〚〛〜〝〞〟〰〾〿–—‘’‛“”„‟…‧﹏'
-CHINESE_PUNC_LIST = CHINESE_PUNC_STOP + CHINESE_PUNC_NON_STOP
+CHINESE_PUNC_OTHER = '·〈〉-'
+CHINESE_PUNC_LIST = CHINESE_PUNC_STOP + CHINESE_PUNC_NON_STOP + CHINESE_PUNC_OTHER
 
 # ================================================================================ #
 #                                    basic class
@@ -601,11 +602,11 @@ class Percentage:
 # ================================================================================ #
 #                            NSW Normalizer
 # ================================================================================ #
-class NSWNormalizer:                                                                                                                                                        
-    def __init__(self, raw_text):                                   
-        self.raw_text = '^' + raw_text + '$'                                        
-        self.norm_text = ''                                                  
-                                                                                    
+class NSWNormalizer:
+    def __init__(self, raw_text):
+        self.raw_text = '^' + raw_text + '$'
+        self.norm_text = ''
+
     def _particular(self):
         text = self.norm_text
         pattern = re.compile(r"(([a-zA-Z]+)二([a-zA-Z]+))")
@@ -774,20 +775,20 @@ if __name__ == '__main__':
         del_chars = ''
         text = text.translate(str.maketrans(old_chars, new_chars, del_chars))
 
-        # 
+        #
         if args.has_key:
             ofile.write(key + '\t' + text + '\n')
         else:
             if text.strip() != '': # skip empty line in pure text format(without Kaldi's utt key)
                 ofile.write(text + '\n')
-        
+
         n += 1
         if n % args.log_interval == 0:
             sys.stderr.write("cn_tn.py: {} lines done.\n".format(n))
             sys.stderr.flush()
-    
+
     sys.stderr.write("cn_tn.py: {} lines done in total.\n".format(n))
     sys.stderr.flush()
-    
+
     ifile.close()
     ofile.close()
