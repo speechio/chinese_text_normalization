@@ -737,6 +737,7 @@ if __name__ == '__main__':
     p.add_argument('--to_upper', action='store_true', help='convert to upper case')
     p.add_argument('--to_lower', action='store_true', help='convert to lower case')
     p.add_argument('--has_key', action='store_true', help="input text has Kaldi's key as first field.")
+    p.add_argument('--mock_key', action='store_true', help="mock Kaldi's key for output text.")
     p.add_argument('--log_interval', type=int, default=100000, help='log interval in number of processed lines')
     args = p.parse_args()
 
@@ -780,6 +781,8 @@ if __name__ == '__main__':
             ofile.write(key + '\t' + text + '\n')
         else:
             if text.strip() != '': # skip empty line in pure text format(without Kaldi's utt key)
+                if args.mock_key:
+                    text = '1\t' + text
                 ofile.write(text + '\n')
 
         n += 1
