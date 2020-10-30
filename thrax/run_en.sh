@@ -1,5 +1,6 @@
 cd src
-thraxmakedep en/verbalizer/verbalizer.grm
+thraxmakedep en/verbalizer/podspeech.grm
 make
-cat ../testcase.txt | thraxrewrite-tester --far=en/verbalizer/verbalizer.far --rules=VERBALIZER
+cat ../testcase_en.txt
+cat ../testcase_en.txt | thraxrewrite-tester --far=en/verbalizer/podspeech.far --rules=POD_SPEECH_TN
 cd -

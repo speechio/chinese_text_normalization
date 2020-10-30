@@ -1,4 +1,4 @@
-en/verbalizer/verbalizer.far: en/verbalizer/verbalizer.grm util/util.far en/verbalizer/extra_numbers.far en/verbalizer/float.far en/verbalizer/math.far en/verbalizer/miscellaneous.far en/verbalizer/money.far en/verbalizer/numbers.far en/verbalizer/numbers_plus.far en/verbalizer/spelled.far en/verbalizer/spoken_punct.far en/verbalizer/time.far en/verbalizer/urls.far
+en/verbalizer/podspeech.far: en/verbalizer/podspeech.grm util/util.far util/case.far en/verbalizer/extra_numbers.far en/verbalizer/float.far en/verbalizer/math.far en/verbalizer/miscellaneous.far en/verbalizer/money.far en/verbalizer/numbers.far en/verbalizer/numbers_plus.far en/verbalizer/spelled.far en/verbalizer/spoken_punct.far en/verbalizer/time.far en/verbalizer/urls.far
 	thraxcompiler --input_grammar=$< --output_far=$@
 
 util/util.far: util/util.grm util/byte.far util/case.far
@@ -62,4 +62,4 @@ en/verbalizer/urls.far: en/verbalizer/urls.grm util/byte.far en/verbalizer/lexic
 	thraxcompiler --input_grammar=$< --output_far=$@
 
 clean:
-	rm -f util/util.far en/verbalizer/extra_numbers.far en/verbalizer/float.far en/verbalizer/math.far en/verbalizer/miscellaneous.far en/verbalizer/money.far en/verbalizer/numbers.far en/verbalizer/numbers_plus.far en/verbalizer/spelled.far en/verbalizer/spoken_punct.far en/verbalizer/time.far en/verbalizer/urls.far util/byte.far util/case.far en/verbalizer/number_names.far universal/thousands_punct.far util/arithmetic.far en/verbalizer/factorization.far en/verbalizer/lexical_map.far ru/classifier/cyrillic.far
+	rm -f util/util.far util/case.far en/verbalizer/extra_numbers.far en/verbalizer/float.far en/verbalizer/math.far en/verbalizer/miscellaneous.far en/verbalizer/money.far en/verbalizer/numbers.far en/verbalizer/numbers_plus.far en/verbalizer/spelled.far en/verbalizer/spoken_punct.far en/verbalizer/time.far en/verbalizer/urls.far util/byte.far en/verbalizer/number_names.far universal/thousands_punct.far util/arithmetic.far en/verbalizer/factorization.far en/verbalizer/lexical_map.far ru/classifier/cyrillic.far
