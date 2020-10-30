@@ -1,3 +1,5 @@
+0. place install_thrax.sh into $KALDI/tools/extras/
+
 1. Add --enable-grm flag to openfst and recompile openfst:
 * cd $KALDI_ROOT/tools
 * make clean
@@ -16,3 +18,7 @@ usage:
 before you run anything related to thrax, use:
 . $KALDI_ROOT/tools/env.sh
 to enable binary finding, like what we always do in kaldi.
+
+sample usage:
+sh run_en.sh
+sh run_cn.sh
