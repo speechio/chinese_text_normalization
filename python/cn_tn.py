@@ -501,6 +501,26 @@ class Fraction:
         numerator, denominator = self.fraction.split('/')
         return num2chn(denominator) + '分之' + num2chn(numerator)
 
+class Time:
+    """
+    Time类
+    """
+    def __init__(self, time=None, chntext=None):
+        self.time = time
+        self.chntext = chntext
+    def chntext2time(self):
+        hours, minutes = self.chntext.split('点')
+        return chn2num(hours) + ':' + chn2num(minutes)
+    def time2chntext(self):
+        hours, minutes = self.time.split(':')
+        if len(hours) == 2 and hours[0] == '0':
+            hours = hours[1]
+        if int(minutes) < 11 and int(minutes) > 0:
+            minutes = str(int(minutes) % 11)
+            return num2chn(hours) + '点' + num2chn(minutes) + '分'
+        if int(minutes) == 0:
+            return num2chn(hours) + '点'
+        return num2chn(hours) + '点' + num2chn(minutes)
 
 class Date:
     """
@@ -674,6 +694,12 @@ class NSWNormalizer:
             for matcher in matchers:
                 text = text.replace(matcher[0], Percentage(percentage=matcher[0]).percentage2chntext(), 1)
 
+        pattern = re.compile(r"(([01]?[0-9]|2[0-3]):[0-5][0-9])")
+        matchers = pattern.findall(text)
+        if matchers:
+            #print('time')
+            for matcher in matchers:
+                text = text.replace(matcher[0], Time(time=matcher[0]).time2chntext(), 1)
         # 规范化纯数+量词
         pattern = re.compile(r"(\d+(\.\d+)?)[多余几]?" + COM_QUANTIFIERS)
         matchers = pattern.findall(text)
@@ -721,6 +747,7 @@ def nsw_test():
     nsw_test_case('日期：1999年2月20日或09年3月15号。')
     nsw_test_case('金钱：12块5，34.5元，20.1万')
     nsw_test_case('特殊：O2O或B2C。')
+    nsw_test_case('时间：00:10登机，08:05下飞机，8:30去吃早饭，12:00回家吧')
     nsw_test_case('3456万吨')
     nsw_test_case('2938个')
     nsw_test_case('938')

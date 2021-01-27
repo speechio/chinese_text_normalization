@@ -41,11 +41,12 @@ This project sets up a ready-to-use TN module for **Chinese**. Since my backgrou
     |money|随便来几个价格12块5，34.5元，20.1万|随便来几个价格十二块五 三十四点五元 二十点一万|
     |percentage|明天有62％的概率降雨|明天有百分之六十二的概率降雨|
     |telephone|这是固话0421-33441122<br>这是手机+86 18544139121|这是固话零四二一三三四四一一二二<br>这是手机八六一八五四四一三九一二一|
+    |time|00:10登机，08:05下飞机，8:30去吃早饭，12:00回家吧|零点十分登机 八点五分下飞机 八点三十去吃早饭 十二点回家吧|
 
     acknowledgement: the NSW normalization codes are based on [Zhiyang Zhou's work here](https://github.com/Joee1995/chn_text_norm.git)
 
 1. punctuation removal
-    
+  
     For Chinese, it removes punctuation list collected in [Zhon](https://github.com/tsroten/zhon) project, containing
     * non-stop puncs
         ```
