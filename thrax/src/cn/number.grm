@@ -52,10 +52,23 @@ number_1000_to_9999 = (
   ((number_1000s ("零":"0") number_10_to_99)<0.0>)|
   ((number_1000s ("零":"00") number_1_to_9)<0.0>)|
   ((number_1000s ("":"000"))<1>) |
-  ((number_1000s number_1_to_9 ("":"00"))<0.0>)
+  ((number_1000s number_1_to_9 ("":"00"))<0.5>)
 );
 
-export number = number_1_to_99 | (number_100_to_999 <-1>) | (number_1000_to_9999 <-2>);
+number_10000_to_99999 = (
+  ((number_10000s number_1000_to_9999)<-1>) |
+  ((number_10000s ("零":"0") number_100_to_999)<0.0>)|
+  ((number_10000s ("零":"00") number_10_to_99)<0.0>)|
+  ((number_10000s ("零":"000") number_1_to_9)<0.0>)|
+  ((number_10000s number_1_to_9 ("":"000"))<0.0>) |
+  ((number_10000s ("":"0000"))<1>)
+);
+
+number_int = number_1_to_99 | (number_100_to_999 <-1>) | (number_1000_to_9999 <-2>) | (number_10000_to_99999 <-3>);
+
+number_float = (number_int ("点":".") number_0_to_9+);
+
+export number = (number_int | (number_float <-4>));
 
 export NUMBER = CDRewrite[number, "", "", b.kBytes*];
 
