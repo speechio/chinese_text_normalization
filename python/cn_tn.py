@@ -994,9 +994,10 @@ if __name__ == '__main__':
     p.add_argument('--to_upper', action='store_true', help='convert to upper case')
     p.add_argument('--to_lower', action='store_true', help='convert to lower case')
     p.add_argument('--has_key', action='store_true', help="input text has Kaldi's key as first field.")
-    p.add_argument('--check_charset', action='store_true' , help='remove sentences if it contains illegal char')
     p.add_argument('--remove_fillers', action='store_true', help='remove filler chars such as "呃, 啊"')
     p.add_argument('--remove_erhua', action='store_true', help='remove erhua chars such as "这儿" -> "这"')
+    p.add_argument('--check_charset', action='store_true' , help='skip sentences containing illegal chars')
+    p.add_argument('--remove_space', action='store_true' , help='remove whitespace')
     p.add_argument('--log_interval', type=int, default=10000, help='log interval in number of processed lines')
     args = p.parse_args()
 
@@ -1052,6 +1053,9 @@ if __name__ == '__main__':
             if (contains_illegal_char(text, charmap)):
                 print(f'WARNING: illegal char in: {text}', file=sys.stderr)
                 continue
+
+        if args.remove_space:
+            text = text.replace(' ', '')
 
         #
         if args.has_key:
