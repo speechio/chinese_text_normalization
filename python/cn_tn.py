@@ -954,11 +954,11 @@ class NSWNormalizer:
         return self.norm_text.lstrip('^').rstrip('$')
 
 
-def contains_illegal_char(text, charmap):
+def check_chars(text, char_map):
     for c in text:
-        if not charmap.get(c):
-            return True
-    return False
+        if not char_map.get(c):
+            return c
+    return ''
 
 
 def nsw_test_case(raw_text):
@@ -996,7 +996,7 @@ if __name__ == '__main__':
     p.add_argument('--has_key', action='store_true', help="input text has Kaldi's key as first field.")
     p.add_argument('--remove_fillers', action='store_true', help='remove filler chars such as "呃, 啊"')
     p.add_argument('--remove_erhua', action='store_true', help='remove erhua chars such as "这儿" -> "这"')
-    p.add_argument('--check_charset', action='store_true' , help='skip sentences containing illegal chars')
+    p.add_argument('--check_chars', action='store_true' , help='skip sentences containing illegal chars')
     p.add_argument('--remove_space', action='store_true' , help='remove whitespace')
     p.add_argument('--log_interval', type=int, default=10000, help='log interval in number of processed lines')
     args = p.parse_args()
@@ -1004,10 +1004,10 @@ if __name__ == '__main__':
     ifile = codecs.open(args.ifile, 'r', 'utf8')
     ofile = codecs.open(args.ofile, 'w+', 'utf8')
 
-    charmap = {}
-    if args.check_charset:
+    legal_char_map = {}
+    if args.check_chars:
         for c in LEGAL_CHARS:
-            charmap[c] = True
+            legal_char_map[c] = True
 
     n = 0
     for l in ifile:
@@ -1049,9 +1049,10 @@ if __name__ == '__main__':
         del_chars = ''
         text = text.translate(str.maketrans(old_chars, new_chars, del_chars))
 
-        if args.check_charset:
-            if (contains_illegal_char(text, charmap)):
-                print(f'WARNING: illegal char in: {text}', file=sys.stderr)
+        if args.check_chars:
+            x = check_chars(text, legal_char_map)
+            if (x):
+                print(f'WARNING: illegal char {x} in: {text}', file=sys.stderr)
                 continue
 
         if args.remove_space:
