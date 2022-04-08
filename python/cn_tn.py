@@ -35,10 +35,12 @@ POINT = [u'点', u'點']
 # SIL = [u'杠', u'槓']
 
 FILLER_CHARS = ['呃', '啊']
+
 ER_WHITELIST = '(儿女|儿子|儿孙|女儿|儿媳|妻儿|' \
              '胎儿|婴儿|新生儿|婴幼儿|幼儿|少儿|小儿|儿歌|儿童|儿科|托儿所|孤儿|' \
              '儿戏|儿化|台儿庄|鹿儿岛|正儿八经|吊儿郎当|生儿育女|托儿带女|养儿防老|痴儿呆女|' \
              '佳儿佳妇|儿怜兽扰|儿无常父|儿不嫌母丑|儿行千里母担忧|儿大不由爷|苏乞儿)'
+ER_WHITELIST_PATTERN = re.compile(ER_WHITELIST)
 
 # 中文数字系统类型
 NUMBERING_TYPES = ['low', 'mid', 'high']
@@ -57,6 +59,15 @@ COM_QUANTIFIERS = '(匹|张|座|回|场|尾|条|个|首|阙|阵|网|炮|顶|丘|
 CHINESE_PUNC_STOP = '！？｡。'
 CHINESE_PUNC_NON_STOP = '＂＃＄％＆＇（）＊＋，－／：；＜＝＞＠［＼］＾＿｀｛｜｝～｟｠｢｣､、〃《》「」『』【】〔〕〖〗〘〙〚〛〜〝〞〟〰〾〿–—‘’‛“”„‟…‧﹏·〈〉-'
 CHINESE_PUNC_LIST = CHINESE_PUNC_STOP + CHINESE_PUNC_NON_STOP
+
+
+# char set
+DIGIT_CHARS = '0123456789'
+
+EN_CHARS = (
+    'abcdefghijklmnopqrstuvwxyz'
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+)
 
 # 2013 China National Standard: https://zh.wikipedia.org/wiki/通用规范汉字表
 # raw resources from: https://github.com/mozillazg/pinyin-data/blob/master/kMandarin_8105.txt , with total 8105 chars
@@ -266,14 +277,9 @@ CN_CHARS = (
     '𬳵𬳶𬳽𬳿𬴂𬴃𬴊𬶋𬶍𬶏𬶐𬶟𬶠𬶨𬶭𬶮𬷕𬸘𬸚𬸣𬸦𬸪𬹼𬺈𬺓'
 )
 
-EN_CHARS = (
-    'abcdefghijklmnopqrstuvwxyz'
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-)
+VALID_CHARS = CN_CHARS + EN_CHARS + DIGIT_CHARS + ' '
 
-DIGIT_CHARS = '0123456789'
-
-LEGAL_CHARS = CN_CHARS + EN_CHARS + DIGIT_CHARS + ' '
+VALID_CHAR_MAP = { c : True for c in VALID_CHARS }
 
 # ================================================================================ #
 #                                    basic class
@@ -822,33 +828,6 @@ class Percentage:
         return '百分之' + num2chn(self.percentage.strip().strip('%'))
 
 
-def remove_erhua(text, er_whitelist):
-    """
-    去除儿化音词中的儿:
-    他女儿在那边儿 -> 他女儿在那边
-    """
-
-    er_pattern = re.compile(er_whitelist)
-    new_str=''
-    while re.search('儿',text):
-        a = re.search('儿',text).span()
-        remove_er_flag = 0
-
-        if er_pattern.search(text):
-            b = er_pattern.search(text).span()
-            if b[0] <= a[0]:
-                remove_er_flag = 1
-
-        if remove_er_flag == 0 :
-            new_str = new_str + text[0:a[0]]
-            text = text[a[1]:]
-        else:
-            new_str = new_str + text[0:b[1]]
-            text = text[b[1]:]
-
-    text = new_str + text
-    return text
-
 # ================================================================================ #
 #                            NSW Normalizer
 # ================================================================================ #
@@ -954,9 +933,39 @@ class NSWNormalizer:
         return self.norm_text.lstrip('^').rstrip('$')
 
 
-def check_chars(text, char_map):
+# ================================================================================ #
+#                            misc normalization functions
+# ================================================================================ #
+def remove_erhua(text):
+    """
+    去除儿化音词中的儿:
+    他女儿在那边儿 -> 他女儿在那边
+    """
+
+    new_str=''
+    while re.search('儿',text):
+        a = re.search('儿',text).span()
+        remove_er_flag = 0
+
+        if ER_WHITELIST_PATTERN.search(text):
+            b = ER_WHITELIST_PATTERN.search(text).span()
+            if b[0] <= a[0]:
+                remove_er_flag = 1
+
+        if remove_er_flag == 0 :
+            new_str = new_str + text[0:a[0]]
+            text = text[a[1]:]
+        else:
+            new_str = new_str + text[0:b[1]]
+            text = text[b[1]:]
+
+    text = new_str + text
+    return text
+
+
+def check_chars(text):
     for c in text:
-        if not char_map.get(c):
+        if not VALID_CHAR_MAP.get(c):
             return c
     return ''
 
@@ -967,6 +976,9 @@ def nsw_test_case(raw_text):
     print('')
 
 
+# ================================================================================ #
+#                            testing
+# ================================================================================ #
 def nsw_test():
     nsw_test_case('固话：0595-23865596或23880880。')
     nsw_test_case('固话：0595-23865596或23880880。')
@@ -985,6 +997,9 @@ def nsw_test():
     nsw_test_case('有62％的概率')
 
 
+# ================================================================================ #
+#                            main entry
+# ================================================================================ #
 if __name__ == '__main__':
     #nsw_test()
 
@@ -1001,77 +1016,62 @@ if __name__ == '__main__':
     p.add_argument('--log_interval', type=int, default=10000, help='log interval in number of processed lines')
     args = p.parse_args()
 
-    ifile = codecs.open(args.ifile, 'r', 'utf8')
-    ofile = codecs.open(args.ofile, 'w+', 'utf8')
+    with open(args.ifile, 'r', encoding = 'utf8') as istream, open(args.ofile, 'w+', encoding = 'utf8') as ostream:
+        ndone = 0
+        for line in istream: 
+            line = line.strip()
 
-    legal_char_map = {}
-    if args.check_chars:
-        for c in LEGAL_CHARS:
-            legal_char_map[c] = True
-
-    n = 0
-    for l in ifile:
-        key = ''
-        text = ''
-        if args.has_key:
-            cols = l.split(maxsplit=1)
-            key = cols[0]
-            if len(cols) == 2:
-                text = cols[1].strip()
+            key, text = '', ''
+            if args.has_key:
+                cols = line.split(maxsplit=1)
+                key = cols[0]
+                text = cols[1] if len(cols) == 2 else ''
             else:
-                text = ''
-        else:
-            text = l.strip()
+                text = line
 
-        # cases
-        if args.to_upper and args.to_lower:
-            sys.stderr.write('text norm: to_upper OR to_lower?')
-            exit(1)
-        if args.to_upper:
-            text = text.upper()
-        if args.to_lower:
-            text = text.lower()
+            # Unify upper/lower cases
+            if args.to_upper:
+                text = text.upper()
+            if args.to_lower:
+                text = text.lower()
 
-        # Filler chars removal
-        if args.remove_fillers:
-            for ch in FILLER_CHARS:
-                text = text.replace(ch, '')
+            # Remove filler chars
+            if args.remove_fillers:
+                for c in FILLER_CHARS:
+                    text = text.replace(c, '')
 
-        if args.remove_erhua:
-            text = remove_erhua(text, ER_WHITELIST)
+            if args.remove_erhua:
+                text = remove_erhua(text)
 
-        # NSW(Non-Standard-Word) normalization
-        text = NSWNormalizer(text).normalize()
+            # NSW(Non-Standard-Word) normalization
+            text = NSWNormalizer(text).normalize()
 
-        # Punctuations removal
-        old_chars = CHINESE_PUNC_LIST + string.punctuation # includes all CN and EN punctuations
-        new_chars = ' ' * len(old_chars)
-        del_chars = ''
-        text = text.translate(str.maketrans(old_chars, new_chars, del_chars))
+            # Remove punctuations
+            old_chars = CHINESE_PUNC_LIST + string.punctuation # includes all CN and EN punctuations
+            new_chars = ' ' * len(old_chars)
+            del_chars = ''
+            text = text.translate(str.maketrans(old_chars, new_chars, del_chars))
 
-        if args.check_chars:
-            x = check_chars(text, legal_char_map)
-            if (x):
-                print(f'WARNING: illegal char {x} in: {text}', file=sys.stderr)
-                continue
+            # Skip lines with invalid chars
+            if args.check_chars:
+                x = check_chars(text)
+                if (x):
+                    print(f'WARNING: illegal char {x} in sentence: {text}', file=sys.stderr)
+                    continue
 
-        if args.remove_space:
-            text = text.replace(' ', '')
+            # Remove space
+            if args.remove_space:
+                text = text.replace(' ', '')
 
-        #
-        if args.has_key:
-            ofile.write(key + '\t' + text + '\n')
-        else:
-            if text.strip() != '': # skip empty line in pure text format(without Kaldi's utt key)
-                ofile.write(text + '\n')
+            #
+            if args.has_key:
+                print(key + '\t' + text, file = ostream)
+            else:
+                if text.strip() != '': # skip empty line in pure text format(without Kaldi's utt key)
+                    print(text, file = ostream)
 
-        n += 1
-        if n % args.log_interval == 0:
-            sys.stderr.write("text norm: {} lines done.\n".format(n))
-            sys.stderr.flush()
+            ndone += 1
+            if ndone % args.log_interval == 0:
+                print(f'text norm: {ndone} lines done.', file = sys.stderr, flush = True)
 
-    sys.stderr.write("text norm: {} lines done in total.\n".format(n))
-    sys.stderr.flush()
-
-    ifile.close()
-    ofile.close()
+        print(f'text norm: {ndone} lines done in total.', file = sys.stderr, flush = True)
