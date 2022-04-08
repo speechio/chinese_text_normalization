@@ -267,8 +267,8 @@ CN_CHARS = (
 )
 
 EN_CHARS = (
-    'abcdefhijklmnopqrstuvwxyz'
-    'ABCDEFHIJKLMNOPQRSTUVWXYZ'
+    'abcdefghijklmnopqrstuvwxyz'
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 )
 
 DIGIT_CHARS = '0123456789'
