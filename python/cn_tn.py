@@ -9,7 +9,7 @@
 #   - python 3.X
 # notes: python 2.X WILL fail or produce misleading results
 
-import sys, os, argparse, codecs, string, re
+import sys, os, argparse, string, re
 
 # ================================================================================ #
 #                                    basic constant
@@ -59,6 +59,107 @@ COM_QUANTIFIERS = '(匹|张|座|回|场|尾|条|个|首|阙|阵|网|炮|顶|丘|
 CHINESE_PUNC_STOP = '！？｡。'
 CHINESE_PUNC_NON_STOP = '＂＃＄％＆＇（）＊＋，－／：；＜＝＞＠［＼］＾＿｀｛｜｝～｟｠｢｣､、〃《》「」『』【】〔〕〖〗〘〙〚〛〜〝〞〟〰〾〿–—‘’‛“”„‟…‧﹏·〈〉-'
 CHINESE_PUNC_LIST = CHINESE_PUNC_STOP + CHINESE_PUNC_NON_STOP
+
+# https://zh.wikipedia.org/wiki/全行和半行
+QJ2BJ = {
+    '　': ' ',
+    '！': '!',
+    '＂': '"',
+    '＃': '#',
+    '＄': '$',
+    '％': '%',
+    '＆': '&',
+    '＇': "'",
+    '（': '(',
+    '）': ')',
+    '＊': '*',
+    '＋': '+',
+    '，': ',',
+    '－': '-',
+    '．': '.',
+    '／': '/',
+    '０': '0',
+    '１': '1',
+    '２': '2',
+    '３': '3',
+    '４': '4',
+    '５': '5',
+    '６': '6',
+    '７': '7',
+    '８': '8',
+    '９': '9',
+    '：': ':',
+    '；': ';',
+    '＜': '<',
+    '＝': '=',
+    '＞': '>',
+    '？': '?',
+    '＠': '@',
+    'Ａ': 'A',
+    'Ｂ': 'B',
+    'Ｃ': 'C',
+    'Ｄ': 'D',
+    'Ｅ': 'E',
+    'Ｆ': 'F',
+    'Ｇ': 'G',
+    'Ｈ': 'H',
+    'Ｉ': 'I',
+    'Ｊ': 'J',
+    'Ｋ': 'K',
+    'Ｌ': 'L',
+    'Ｍ': 'M',
+    'Ｎ': 'N',
+    'Ｏ': 'O',
+    'Ｐ': 'P',
+    'Ｑ': 'Q',
+    'Ｒ': 'R',
+    'Ｓ': 'S',
+    'Ｔ': 'T',
+    'Ｕ': 'U',
+    'Ｖ': 'V',
+    'Ｗ': 'W',
+    'Ｘ': 'X',
+    'Ｙ': 'Y',
+    'Ｚ': 'Z',
+    '［': '[',
+    '＼': '\\',
+    '］': ']',
+    '＾': '^',
+    '＿': '_',
+    '｀': '`',
+    'ａ': 'a',
+    'ｂ': 'b',
+    'ｃ': 'c',
+    'ｄ': 'd',
+    'ｅ': 'e',
+    'ｆ': 'f',
+    'ｇ': 'g',
+    'ｈ': 'h',
+    'ｉ': 'i',
+    'ｊ': 'j',
+    'ｋ': 'k',
+    'ｌ': 'l',
+    'ｍ': 'm',
+    'ｎ': 'n',
+    'ｏ': 'o',
+    'ｐ': 'p',
+    'ｑ': 'q',
+    'ｒ': 'r',
+    'ｓ': 's',
+    'ｔ': 't',
+    'ｕ': 'u',
+    'ｖ': 'v',
+    'ｗ': 'w',
+    'ｘ': 'x',
+    'ｙ': 'y',
+    'ｚ': 'z',
+    '｛': '{',
+    '｜': '|',
+    '｝': '}',
+    '～': '~',
+}
+
+QJ2BJ_transform = str.maketrans(''.join(QJ2BJ.keys()), ''.join(QJ2BJ.values()), '')
 
 
 # char set
@@ -970,15 +1071,20 @@ def check_chars(text):
     return ''
 
 
+def quanjiao2banjiao(text):
+    return text.translate(QJ2BJ_transform)
+
+
+# ================================================================================ #
+#                            testing
+# ================================================================================ #
+
 def nsw_test_case(raw_text):
     print('I:' + raw_text)
     print('O:' + NSWNormalizer(raw_text).normalize())
     print('')
 
 
-# ================================================================================ #
-#                            testing
-# ================================================================================ #
 def nsw_test():
     nsw_test_case('固话：0595-23865596或23880880。')
     nsw_test_case('固话：0595-23865596或23880880。')
@@ -1006,6 +1112,7 @@ if __name__ == '__main__':
     p = argparse.ArgumentParser()
     p.add_argument('ifile', help='input filename, assume utf-8 encoding')
     p.add_argument('ofile', help='output filename')
+    p.add_argument('--to_banjiao', action='store_true', help='convert quanjiao chars to banjiao')
     p.add_argument('--to_upper', action='store_true', help='convert to upper case')
     p.add_argument('--to_lower', action='store_true', help='convert to lower case')
     p.add_argument('--has_key', action='store_true', help="input text has Kaldi's key as first field.")
@@ -1028,6 +1135,10 @@ if __name__ == '__main__':
                 text = cols[1] if len(cols) == 2 else ''
             else:
                 text = line
+
+            # quanjiao -> banjiao
+            if args.to_banjiao:
+                text = quanjiao2banjiao(text)
 
             # Unify upper/lower cases
             if args.to_upper:
