@@ -379,8 +379,7 @@ CN_CHARS = (
 )
 
 VALID_CHARS = CN_CHARS + EN_CHARS + DIGIT_CHARS + ' '
-
-VALID_CHAR_MAP = { c : True for c in VALID_CHARS }
+VALID_CHARS_MAP = { c : True for c in VALID_CHARS }
 
 # ================================================================================ #
 #                                    basic class
@@ -1066,7 +1065,7 @@ def remove_erhua(text):
 
 def check_chars(text):
     for c in text:
-        if not VALID_CHAR_MAP.get(c):
+        if not VALID_CHARS_MAP.get(c):
             return c
     return ''
 
