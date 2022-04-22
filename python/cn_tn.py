@@ -167,7 +167,9 @@ QJ2BJ_TRANSFORM = str.maketrans(''.join(QJ2BJ.keys()), ''.join(QJ2BJ.values()), 
 
 
 # 2013 China National Standard: https://zh.wikipedia.org/wiki/通用规范汉字表
-# raw resources from: https://github.com/mozillazg/pinyin-data/blob/master/kMandarin_8105.txt , with total 8105 chars
+# raw resources:
+#   https://github.com/mozillazg/pinyin-data/blob/master/kMandarin_8105.txt
+#   with 8105 chinese chars in total
 CN_CHARS = (
     '一丁七万丈三上下不与丏丐丑专且丕世丘丙业丛东丝丞丢两严丧个丫中丰串临丸丹为主丽举'
     '乂乃久么义之乌乍乎乏乐乒乓乔乖乘乙乜九乞也习乡书乩买乱乳乸乾了予争事二亍于亏云互'
