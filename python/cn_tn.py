@@ -55,10 +55,15 @@ COM_QUANTIFIERS = '(匹|张|座|回|场|尾|条|个|首|阙|阵|网|炮|顶|丘|
                   '盒|杯|钟|斛|锅|簋|篮|盘|桶|罐|瓶|壶|卮|盏|箩|箱|煲|啖|袋|钵|年|月|日|季|刻|时|周|天|秒|分|旬|' \
                   '纪|岁|世|更|夜|春|夏|秋|冬|代|伏|辈|丸|泡|粒|颗|幢|堆|条|根|支|道|面|片|张|颗|块)'
 
-# punctuation information are based on Zhon project (https://github.com/tsroten/zhon.git)
+
+# Punctuation information are based on Zhon project (https://github.com/tsroten/zhon.git)
 CHINESE_PUNC_STOP = '！？｡。'
 CHINESE_PUNC_NON_STOP = '＂＃＄％＆＇（）＊＋，－／：；＜＝＞＠［＼］＾＿｀｛｜｝～｟｠｢｣､、〃《》「」『』【】〔〕〖〗〘〙〚〛〜〝〞〟〰〾〿–—‘’‛“”„‟…‧﹏·〈〉-'
 CHINESE_PUNC_LIST = CHINESE_PUNC_STOP + CHINESE_PUNC_NON_STOP
+
+PUNC_LIST = CHINESE_PUNC_LIST + string.punctuation
+PUNC_TRANSFORM = str.maketrans(PUNC_LIST, ' ' * len(PUNC_LIST), '') # replace puncs with space
+
 
 # https://zh.wikipedia.org/wiki/全行和半行
 QJ2BJ = {
@@ -158,17 +163,8 @@ QJ2BJ = {
     '｝': '}',
     '～': '~',
 }
+QJ2BJ_TRANSFORM = str.maketrans(''.join(QJ2BJ.keys()), ''.join(QJ2BJ.values()), '')
 
-QJ2BJ_transform = str.maketrans(''.join(QJ2BJ.keys()), ''.join(QJ2BJ.values()), '')
-
-
-# char set
-DIGIT_CHARS = '0123456789'
-
-EN_CHARS = (
-    'abcdefghijklmnopqrstuvwxyz'
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-)
 
 # 2013 China National Standard: https://zh.wikipedia.org/wiki/通用规范汉字表
 # raw resources from: https://github.com/mozillazg/pinyin-data/blob/master/kMandarin_8105.txt , with total 8105 chars
@@ -378,8 +374,9 @@ CN_CHARS = (
     '𬳵𬳶𬳽𬳿𬴂𬴃𬴊𬶋𬶍𬶏𬶐𬶟𬶠𬶨𬶭𬶮𬷕𬸘𬸚𬸣𬸦𬸪𬹼𬺈𬺓'
 )
 
-VALID_CHARS = CN_CHARS + EN_CHARS + DIGIT_CHARS + ' '
-VALID_CHARS_MAP = { c : True for c in VALID_CHARS }
+VALID_CHARS = CN_CHARS + string.ascii_lowercase + string.ascii_uppercase + string.digits + ' '
+IN_VALID_CHARS = { c : True for c in VALID_CHARS }
+
 
 # ================================================================================ #
 #                                    basic class
@@ -1063,16 +1060,36 @@ def remove_erhua(text):
     return text
 
 
-def check_chars(text):
-    for c in text:
-        if not VALID_CHARS_MAP.get(c):
-            return c
-    return ''
+def normalize(text, args):
+    if args.to_banjiao:
+        text = text.translate(QJ2BJ_TRANSFORM)
 
+    if args.to_upper:
+        text = text.upper()
+    if args.to_lower:
+        text = text.lower()
 
-def quanjiao2banjiao(text):
-    return text.translate(QJ2BJ_transform)
+    if args.remove_fillers:
+        for c in FILLER_CHARS:
+            text = text.replace(c, '')
 
+    if args.remove_erhua:
+        text = remove_erhua(text)
+
+    text = NSWNormalizer(text).normalize()
+
+    text = text.translate(PUNC_TRANSFORM)
+
+    if args.check_chars:
+        for c in text:
+            if not IN_VALID_CHARS.get(c):
+                print(f'WARNING: illegal char {x} in: {text}', file=sys.stderr)
+                return ''
+
+    if args.remove_space:
+        text = text.replace(' ', '')
+
+    return text
 
 # ================================================================================ #
 #                            testing
@@ -1102,9 +1119,6 @@ def nsw_test():
     nsw_test_case('有62％的概率')
 
 
-# ================================================================================ #
-#                            main entry
-# ================================================================================ #
 if __name__ == '__main__':
     #nsw_test()
 
@@ -1126,60 +1140,21 @@ if __name__ == '__main__':
 
     with open(args.ifile, 'r', encoding = 'utf8') as istream, open(args.ofile, 'w+', encoding = 'utf8') as ostream:
         ndone = 0
-        for line in istream: 
-            line = line.strip()
-
+        for l in istream:
             key, text = '', ''
             if args.has_key:
-                cols = line.split(maxsplit=1)
-                key = cols[0]
-                text = cols[1] if len(cols) == 2 else ''
+                cols = l.strip().split(maxsplit=1)
+                key, text = cols[0], cols[1] if len(cols) == 2 else ''
             else:
-                text = line
+                text = l.strip()
 
-            # quanjiao -> banjiao
-            if args.to_banjiao:
-                text = quanjiao2banjiao(text)
+            if text:
+                text = normalize(text, args)
 
-            # Unify upper/lower cases
-            if args.to_upper:
-                text = text.upper()
-            if args.to_lower:
-                text = text.lower()
-
-            # Remove filler chars
-            if args.remove_fillers:
-                for c in FILLER_CHARS:
-                    text = text.replace(c, '')
-
-            if args.remove_erhua:
-                text = remove_erhua(text)
-
-            # NSW(Non-Standard-Word) normalization
-            text = NSWNormalizer(text).normalize()
-
-            # Remove punctuations
-            old_chars = CHINESE_PUNC_LIST + string.punctuation # includes all CN and EN punctuations
-            new_chars = ' ' * len(old_chars)
-            del_chars = ''
-            text = text.translate(str.maketrans(old_chars, new_chars, del_chars))
-
-            # Skip lines with invalid chars
-            if args.check_chars:
-                x = check_chars(text)
-                if (x):
-                    print(f'WARNING: illegal char {x} in sentence: {text}', file=sys.stderr)
-                    continue
-
-            # Remove space
-            if args.remove_space:
-                text = text.replace(' ', '')
-
-            #
-            if args.has_key:
-                print(key + '\t' + text, file = ostream)
-            else:
-                if text.strip() != '': # skip empty line in pure text format(without Kaldi's utt key)
+            if text:
+                if args.has_key:
+                    print(key + '\t' + text, file = ostream)
+                else:
                     print(text, file = ostream)
 
             ndone += 1
@@ -1187,3 +1162,4 @@ if __name__ == '__main__':
                 print(f'text norm: {ndone} lines done.', file = sys.stderr, flush = True)
 
         print(f'text norm: {ndone} lines done in total.', file = sys.stderr, flush = True)
+
