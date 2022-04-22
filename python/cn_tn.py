@@ -376,7 +376,7 @@ CN_CHARS = (
     '𬳵𬳶𬳽𬳿𬴂𬴃𬴊𬶋𬶍𬶏𬶐𬶟𬶠𬶨𬶭𬶮𬷕𬸘𬸚𬸣𬸦𬸪𬹼𬺈𬺓'
 )
 
-VALID_CHARS = CN_CHARS + string.ascii_lowercase + string.ascii_uppercase + string.digits + ' '
+VALID_CHARS = CN_CHARS + string.ascii_letters + string.digits + ' '
 IN_VALID_CHARS = { c : True for c in VALID_CHARS }
 
 
