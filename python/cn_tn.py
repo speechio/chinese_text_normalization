@@ -1101,33 +1101,33 @@ class TextNormConfig:
         self.check_chars = True
         self.remove_space = True
 
-def normalize(text, opts = TextNormConfig()):
-    if opts.to_banjiao:
+def normalize(text, config = TextNormConfig()):
+    if config.to_banjiao:
         text = text.translate(QJ2BJ_TRANSFORM)
 
-    if opts.to_upper:
+    if config.to_upper:
         text = text.upper()
-    if opts.to_lower:
+    if config.to_lower:
         text = text.lower()
 
-    if opts.remove_fillers:
+    if config.remove_fillers:
         for c in FILLER_CHARS:
             text = text.replace(c, '')
 
-    if opts.remove_erhua:
+    if config.remove_erhua:
         text = remove_erhua(text)
 
     text = NSWNormalizer(text).normalize()
 
     text = text.translate(PUNC_TRANSFORM)
 
-    if opts.check_chars:
+    if config.check_chars:
         for c in text:
             if not IN_VALID_CHARS.get(c):
                 print(f'WARNING: illegal char {x} in: {text}', file=sys.stderr)
                 return ''
 
-    if opts.remove_space:
+    if config.remove_space:
         text = text.replace(' ', '')
 
     return text
