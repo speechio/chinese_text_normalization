@@ -1062,37 +1062,6 @@ def remove_erhua(text):
     return text
 
 
-def normalize(text, args):
-    if args.to_banjiao:
-        text = text.translate(QJ2BJ_TRANSFORM)
-
-    if args.to_upper:
-        text = text.upper()
-    if args.to_lower:
-        text = text.lower()
-
-    if args.remove_fillers:
-        for c in FILLER_CHARS:
-            text = text.replace(c, '')
-
-    if args.remove_erhua:
-        text = remove_erhua(text)
-
-    text = NSWNormalizer(text).normalize()
-
-    text = text.translate(PUNC_TRANSFORM)
-
-    if args.check_chars:
-        for c in text:
-            if not IN_VALID_CHARS.get(c):
-                print(f'WARNING: illegal char {x} in: {text}', file=sys.stderr)
-                return ''
-
-    if args.remove_space:
-        text = text.replace(' ', '')
-
-    return text
-
 # ================================================================================ #
 #                            testing
 # ================================================================================ #
@@ -1119,6 +1088,49 @@ def nsw_test():
     nsw_test_case('938')
     nsw_test_case('今天吃了115个小笼包231个馒头')
     nsw_test_case('有62％的概率')
+
+
+class TextNormConfig:
+    def __init__(self):
+        self.has_key = False
+        self.to_banjiao = True
+        self.to_upper = True
+        self.to_lower = False
+        self.remove_fillers = True
+        self.remove_erhua = False
+        self.check_chars = True
+        self.remove_space = True
+
+def normalize(text, opts = TextNormConfig()):
+    if opts.to_banjiao:
+        text = text.translate(QJ2BJ_TRANSFORM)
+
+    if opts.to_upper:
+        text = text.upper()
+    if opts.to_lower:
+        text = text.lower()
+
+    if opts.remove_fillers:
+        for c in FILLER_CHARS:
+            text = text.replace(c, '')
+
+    if opts.remove_erhua:
+        text = remove_erhua(text)
+
+    text = NSWNormalizer(text).normalize()
+
+    text = text.translate(PUNC_TRANSFORM)
+
+    if opts.check_chars:
+        for c in text:
+            if not IN_VALID_CHARS.get(c):
+                print(f'WARNING: illegal char {x} in: {text}', file=sys.stderr)
+                return ''
+
+    if opts.remove_space:
+        text = text.replace(' ', '')
+
+    return text
 
 
 if __name__ == '__main__':
