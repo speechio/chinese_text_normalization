@@ -1062,6 +1062,47 @@ def remove_erhua(text):
     return text
 
 
+def textnorm(
+        text,
+        to_banjiao = True,
+        to_upper = True,
+        to_lower = False,
+        remove_fillers = True,
+        remove_erhua = False,
+        check_chars = True,
+        remove_space = True,
+    ) :
+    if to_banjiao:
+        text = text.translate(QJ2BJ_TRANSFORM)
+
+    if to_upper:
+        text = text.upper()
+    if to_lower:
+        text = text.lower()
+
+    if remove_fillers:
+        for c in FILLER_CHARS:
+            text = text.replace(c, '')
+
+    if remove_erhua:
+        text = remove_erhua(text)
+
+    text = NSWNormalizer(text).normalize()
+
+    text = text.translate(PUNC_TRANSFORM)
+
+    if check_chars:
+        for c in text:
+            if not IN_VALID_CHARS.get(c):
+                print(f'WARNING: illegal char {x} in: {text}', file=sys.stderr)
+                return ''
+
+    if remove_space:
+        text = text.replace(' ', '')
+
+    return text
+
+
 # ================================================================================ #
 #                            testing
 # ================================================================================ #
@@ -1090,56 +1131,12 @@ def nsw_test():
     nsw_test_case('有62％的概率')
 
 
-class TextNormConfig:
-    def __init__(self):
-        self.has_key = False
-        self.to_banjiao = True
-        self.to_upper = True
-        self.to_lower = False
-        self.remove_fillers = True
-        self.remove_erhua = False
-        self.check_chars = True
-        self.remove_space = True
-
-def normalize(text, config = TextNormConfig()):
-    if config.to_banjiao:
-        text = text.translate(QJ2BJ_TRANSFORM)
-
-    if config.to_upper:
-        text = text.upper()
-    if config.to_lower:
-        text = text.lower()
-
-    if config.remove_fillers:
-        for c in FILLER_CHARS:
-            text = text.replace(c, '')
-
-    if config.remove_erhua:
-        text = remove_erhua(text)
-
-    text = NSWNormalizer(text).normalize()
-
-    text = text.translate(PUNC_TRANSFORM)
-
-    if config.check_chars:
-        for c in text:
-            if not IN_VALID_CHARS.get(c):
-                print(f'WARNING: illegal char {x} in: {text}', file=sys.stderr)
-                return ''
-
-    if config.remove_space:
-        text = text.replace(' ', '')
-
-    return text
-
-
 if __name__ == '__main__':
     #nsw_test()
 
     p = argparse.ArgumentParser()
-    p.add_argument('--has_key', action='store_true', help="input text has Kaldi's key as first field.")
-    p.add_argument('--log_interval', type=int, default=10000, help='log interval in number of processed lines')
 
+    # normalizer behaviour options
     p.add_argument('--to_banjiao', action='store_true', help='convert quanjiao chars to banjiao')
     p.add_argument('--to_upper', action='store_true', help='convert to upper case')
     p.add_argument('--to_lower', action='store_true', help='convert to lower case')
@@ -1148,8 +1145,12 @@ if __name__ == '__main__':
     p.add_argument('--check_chars', action='store_true' , help='skip sentences containing illegal chars')
     p.add_argument('--remove_space', action='store_true' , help='remove whitespace')
 
+    # I/O
+    p.add_argument('--has_key', action='store_true', help="input text has Kaldi's key as first field.")
+    p.add_argument('--log_interval', type=int, default=10000, help='log interval in number of processed lines')
     p.add_argument('ifile', help='input filename, assume utf-8 encoding')
     p.add_argument('ofile', help='output filename')
+
     args = p.parse_args()
 
     with open(args.ifile, 'r', encoding = 'utf8') as istream, open(args.ofile, 'w+', encoding = 'utf8') as ostream:
@@ -1163,7 +1164,15 @@ if __name__ == '__main__':
                 text = l.strip()
 
             if text:
-                text = normalize(text, args)
+                text = textnorm(text,
+                    to_banjiao = args.to_banjiao,
+                    to_upper = args.to_upper,
+                    to_lower = args.to_lower,
+                    remove_fillers = args.remove_fillers,
+                    remove_erhua = args.remove_erhua,
+                    check_chars = args.check_chars,
+                    remove_space = args.remove_space,
+                )
 
             if text:
                 if args.has_key:
