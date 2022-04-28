@@ -1064,13 +1064,13 @@ def remove_erhua(text):
 
 def textnorm(
         text,
-        to_banjiao = True,
-        to_upper = True,
+        to_banjiao = False,
+        to_upper = False,
         to_lower = False,
-        remove_fillers = True,
+        remove_fillers = False,
         remove_erhua = False,
-        check_chars = True,
-        remove_space = True,
+        check_chars = False,
+        remove_space = False,
     ) :
     if to_banjiao:
         text = text.translate(QJ2BJ_TRANSFORM)
