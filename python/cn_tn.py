@@ -1032,9 +1032,6 @@ class NSWNormalizer:
         return self.norm_text.lstrip('^').rstrip('$')
 
 
-# ================================================================================ #
-#                            misc normalization functions
-# ================================================================================ #
 def remove_erhua(text):
     """
     去除儿化音词中的儿:
@@ -1062,45 +1059,55 @@ def remove_erhua(text):
     return text
 
 
-def normalize(
-        text,
-        to_banjiao = False,
-        to_upper = False,
-        to_lower = False,
-        remove_fillers = False,
-        remove_erhua = False,
-        check_chars = False,
-        remove_space = False,
+class TextNorm:
+    def __init__(self, 
+        to_banjiao:bool = False,
+        to_upper:bool = False,
+        to_lower:bool = False,
+        remove_fillers:bool = False,
+        remove_erhua:bool = False,
+        check_chars:bool = False,
+        remove_space:bool = False,
     ) :
-    if to_banjiao:
-        text = text.translate(QJ2BJ_TRANSFORM)
+        self.to_banjiao = to_banjiao
+        self.to_upper = to_upper
+        self.to_lower = to_lower
+        self.remove_fillers = remove_fillers
+        self.remove_erhua = remove_erhua
+        self.check_chars = check_chars
+        self.remove_space = remove_space
 
-    if to_upper:
-        text = text.upper()
-    if to_lower:
-        text = text.lower()
+    def __call__(self, text):
+        if self.to_banjiao:
+            text = text.translate(QJ2BJ_TRANSFORM)
 
-    if remove_fillers:
-        for c in FILLER_CHARS:
-            text = text.replace(c, '')
+        if self.to_upper:
+            text = text.upper()
 
-    if remove_erhua:
-        text = remove_erhua(text)
+        if self.to_lower:
+            text = text.lower()
 
-    text = NSWNormalizer(text).apply()
+        if self.remove_fillers:
+            for c in FILLER_CHARS:
+                text = text.replace(c, '')
 
-    text = text.translate(PUNC_TRANSFORM)
+        if self.remove_erhua:
+            text = remove_erhua(text)
 
-    if check_chars:
-        for c in text:
-            if not IN_VALID_CHARS.get(c):
-                print(f'WARNING: illegal char {x} in: {text}', file=sys.stderr)
-                return ''
+        text = NSWNormalizer(text).apply()
 
-    if remove_space:
-        text = text.replace(' ', '')
+        text = text.translate(PUNC_TRANSFORM)
 
-    return text
+        if self.check_chars:
+            for c in text:
+                if not IN_VALID_CHARS.get(c):
+                    print(f'WARNING: illegal char {x} in: {text}', file=sys.stderr)
+                    return ''
+
+        if self.remove_space:
+            text = text.replace(' ', '')
+
+        return text
 
 
 # ================================================================================ #
@@ -1153,6 +1160,16 @@ if __name__ == '__main__':
 
     args = p.parse_args()
 
+    normalizer = TextNorm(
+        to_banjiao = args.to_banjiao,
+        to_upper = args.to_upper,
+        to_lower = args.to_lower,
+        remove_fillers = args.remove_fillers,
+        remove_erhua = args.remove_erhua,
+        check_chars = args.check_chars,
+        remove_space = args.remove_space,
+    )
+
     with open(args.ifile, 'r', encoding = 'utf8') as istream, open(args.ofile, 'w+', encoding = 'utf8') as ostream:
         ndone = 0
         for l in istream:
@@ -1164,15 +1181,7 @@ if __name__ == '__main__':
                 text = l.strip()
 
             if text:
-                text = normalize(text,
-                    to_banjiao = args.to_banjiao,
-                    to_upper = args.to_upper,
-                    to_lower = args.to_lower,
-                    remove_fillers = args.remove_fillers,
-                    remove_erhua = args.remove_erhua,
-                    check_chars = args.check_chars,
-                    remove_space = args.remove_space,
-                )
+                text = normalizer(text)
 
             if text:
                 if args.has_key:
