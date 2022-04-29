@@ -10,6 +10,7 @@
 # notes: python 2.X WILL fail or produce misleading results
 
 import sys, os, argparse, string, re
+import csv
 
 # ================================================================================ #
 #                                    basic constant
@@ -1060,7 +1061,7 @@ def remove_erhua(text):
 
 
 class TextNorm:
-    def __init__(self, 
+    def __init__(self,
         to_banjiao:bool = False,
         to_upper:bool = False,
         to_lower:bool = False,
@@ -1153,8 +1154,9 @@ if __name__ == '__main__':
     p.add_argument('--remove_space', action='store_true' , help='remove whitespace')
 
     # I/O
-    p.add_argument('--has_key', action='store_true', help="input text has Kaldi's key as first field.")
     p.add_argument('--log_interval', type=int, default=10000, help='log interval in number of processed lines')
+    p.add_argument('--has_key', action='store_true', help="will be deprecated, set --format kaldi instead")
+    p.add_argument('--format', type=str, choices=['text', 'kaldi', 'tsv'], default='text', help='input format')
     p.add_argument('ifile', help='input filename, assume utf-8 encoding')
     p.add_argument('ofile', help='output filename')
 
@@ -1172,26 +1174,50 @@ if __name__ == '__main__':
 
     with open(args.ifile, 'r', encoding = 'utf8') as istream, open(args.ofile, 'w+', encoding = 'utf8') as ostream:
         ndone = 0
-        for l in istream:
-            key, text = '', ''
-            if args.has_key:
-                cols = l.strip().split(maxsplit=1)
-                key, text = cols[0], cols[1] if len(cols) == 2 else ''
-            else:
-                text = l.strip()
 
-            if text:
-                text = normalizer(text)
+        if args.has_key:
+            args.format = 'kaldi'
 
-            if text:
-                if args.has_key:
-                    print(key + '\t' + text, file = ostream)
+        if args.format == 'tsv':
+            reader = csv.DictReader(istream, delimiter = '\t')
+            assert('TEXT' in reader.fieldnames)
+
+            print('\t'.join(reader.fieldnames), file=ostream)
+
+            for item in reader:
+                text = item['TEXT']
+
+                if text:
+                    text = normalizer(text)
+
+                if text:
+                    item['TEXT'] = text
+                    print('\t'.join([ item[f] for f in reader.fieldnames ]), file = ostream)
+
+                ndone += 1
+                if ndone % args.log_interval == 0:
+                    print(f'text norm: {ndone} lines done.', file = sys.stderr, flush = True)
+        else:
+            for l in istream:
+                key, text = '', ''
+                if args.format == 'kaldi':
+                    cols = l.strip().split(maxsplit=1)
+                    key, text = cols[0], cols[1] if len(cols) == 2 else ''
                 else:
-                    print(text, file = ostream)
+                    text = l.strip()
 
-            ndone += 1
-            if ndone % args.log_interval == 0:
-                print(f'text norm: {ndone} lines done.', file = sys.stderr, flush = True)
+                if text:
+                    text = normalizer(text)
+
+                if text:
+                    if args.format == 'kaldi':
+                        print(key + '\t' + text, file = ostream)
+                    else:
+                        print(text, file = ostream)
+
+                ndone += 1
+                if ndone % args.log_interval == 0:
+                    print(f'text norm: {ndone} lines done.', file = sys.stderr, flush = True)
 
         print(f'text norm: {ndone} lines done in total.', file = sys.stderr, flush = True)
 
