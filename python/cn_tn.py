@@ -946,7 +946,7 @@ class NSWNormalizer:
         self.norm_text = text
         return self.norm_text
 
-    def normalize(self):
+    def apply(self):
         text = self.raw_text
 
         # 规范化日期
@@ -1062,7 +1062,7 @@ def remove_erhua(text):
     return text
 
 
-def textnorm(
+def normalize(
         text,
         to_banjiao = False,
         to_upper = False,
@@ -1087,7 +1087,7 @@ def textnorm(
     if remove_erhua:
         text = remove_erhua(text)
 
-    text = NSWNormalizer(text).normalize()
+    text = NSWNormalizer(text).apply()
 
     text = text.translate(PUNC_TRANSFORM)
 
@@ -1109,7 +1109,7 @@ def textnorm(
 
 def nsw_test_case(raw_text):
     print('I:' + raw_text)
-    print('O:' + NSWNormalizer(raw_text).normalize())
+    print('O:' + NSWNormalizer(raw_text).apply())
     print('')
 
 
@@ -1164,7 +1164,7 @@ if __name__ == '__main__':
                 text = l.strip()
 
             if text:
-                text = textnorm(text,
+                text = normalize(text,
                     to_banjiao = args.to_banjiao,
                     to_upper = args.to_upper,
                     to_lower = args.to_lower,
