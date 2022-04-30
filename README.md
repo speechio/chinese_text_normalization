@@ -87,6 +87,7 @@ This project sets up a ready-to-use TN module for **Chinese**. Since my backgrou
     UTT01	audio/UTT01.wav	今晚8点整中央5播出2020年总决赛
     ...
 ```
+
     pass `--format tsv` option, normalization will apply to `TEXT` field only.
 
 _note: All input text should be UTF-8 encoded._
