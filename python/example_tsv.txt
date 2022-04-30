@@ -1,0 +1,3 @@
+ID	AUDIO	DURATION	TEXT
+e5oipIfM49I__20190201_CCTV_1	audio/e5oipIfM49I__20190201_CCTV_1.wav	1.28	各位观众8点晚上好
+e5oipIfM49I__20190201_CCTV_104	audio/e5oipIfM49I__20190201_CCTV_104.wav	5.24	2019年春节是团圆是温暖是亲情是说不尽的家长里短

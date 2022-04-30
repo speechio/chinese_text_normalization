@@ -1,8 +1,11 @@
 # for plain text
-python3 cn_tn.py example_plain.txt output_plain.txt
-diff example_plain.txt output_plain.txt
+python3 cn_tn.py example_text.txt output_text.txt
+diff example_text.txt output_text.txt
 
-# for Kaldi's trans format
-python3 cn_tn.py --has_key example_kaldi.txt output_kaldi.txt
+# for Kaldi format
+python3 cn_tn.py --format kaldi example_kaldi.txt output_kaldi.txt
 diff example_kaldi.txt output_kaldi.txt
 
+# for tsv format
+python3 cn_tn.py --format tsv example_tsv.txt output_tsv.txt
+diff example_tsv.txt output_tsv.txt

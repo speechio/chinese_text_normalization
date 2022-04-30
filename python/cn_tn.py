@@ -3,13 +3,14 @@
 
 # Authors:
 #   2019.5 Zhiyang Zhou (https://github.com/Joee1995/chn_text_norm.git)
-#   2019.9 Jiayu DU
+#   2019.9 - 2022 Jiayu DU
 #
 # requirements:
 #   - python 3.X
 # notes: python 2.X WILL fail or produce misleading results
 
-import sys, os, argparse, string, re
+import sys, os, argparse
+import string, re
 import csv
 
 # ================================================================================ #
@@ -928,109 +929,96 @@ class Percentage:
         return '百分之' + num2chn(self.percentage.strip().strip('%'))
 
 
-# ================================================================================ #
-#                            NSW Normalizer
-# ================================================================================ #
-class NSWNormalizer:
-    def __init__(self, raw_text):
-        self.raw_text = '^' + raw_text + '$'
-        self.norm_text = ''
+def normalize_nsw(raw_text):
+    text = '^' + raw_text + '$'
 
-    def _particular(self):
-        text = self.norm_text
-        pattern = re.compile(r"(([a-zA-Z]+)二([a-zA-Z]+))")
-        matchers = pattern.findall(text)
-        if matchers:
-            # print('particular')
-            for matcher in matchers:
-                text = text.replace(matcher[0], matcher[1]+'2'+matcher[2], 1)
-        self.norm_text = text
-        return self.norm_text
+    # 规范化日期
+    pattern = re.compile(r"\D+((([089]\d|(19|20)\d{2})年)?(\d{1,2}月(\d{1,2}[日号])?)?)")
+    matchers = pattern.findall(text)
+    if matchers:
+        #print('date')
+        for matcher in matchers:
+            text = text.replace(matcher[0], Date(date=matcher[0]).date2chntext(), 1)
 
-    def apply(self):
-        text = self.raw_text
+    # 规范化金钱
+    pattern = re.compile(r"\D+((\d+(\.\d+)?)[多余几]?" + CURRENCY_UNITS + r"(\d" + CURRENCY_UNITS + r"?)?)")
+    matchers = pattern.findall(text)
+    if matchers:
+        #print('money')
+        for matcher in matchers:
+            text = text.replace(matcher[0], Money(money=matcher[0]).money2chntext(), 1)
 
-        # 规范化日期
-        pattern = re.compile(r"\D+((([089]\d|(19|20)\d{2})年)?(\d{1,2}月(\d{1,2}[日号])?)?)")
-        matchers = pattern.findall(text)
-        if matchers:
-            #print('date')
-            for matcher in matchers:
-                text = text.replace(matcher[0], Date(date=matcher[0]).date2chntext(), 1)
+    # 规范化固话/手机号码
+    # 手机
+    # http://www.jihaoba.com/news/show/13680
+    # 移动：139、138、137、136、135、134、159、158、157、150、151、152、188、187、182、183、184、178、198
+    # 联通：130、131、132、156、155、186、185、176
+    # 电信：133、153、189、180、181、177
+    pattern = re.compile(r"\D((\+?86 ?)?1([38]\d|5[0-35-9]|7[678]|9[89])\d{8})\D")
+    matchers = pattern.findall(text)
+    if matchers:
+        #print('telephone')
+        for matcher in matchers:
+            text = text.replace(matcher[0], TelePhone(telephone=matcher[0]).telephone2chntext(), 1)
+    # 固话
+    pattern = re.compile(r"\D((0(10|2[1-3]|[3-9]\d{2})-?)?[1-9]\d{6,7})\D")
+    matchers = pattern.findall(text)
+    if matchers:
+        # print('fixed telephone')
+        for matcher in matchers:
+            text = text.replace(matcher[0], TelePhone(telephone=matcher[0]).telephone2chntext(fixed=True), 1)
 
-        # 规范化金钱
-        pattern = re.compile(r"\D+((\d+(\.\d+)?)[多余几]?" + CURRENCY_UNITS + r"(\d" + CURRENCY_UNITS + r"?)?)")
-        matchers = pattern.findall(text)
-        if matchers:
-            #print('money')
-            for matcher in matchers:
-                text = text.replace(matcher[0], Money(money=matcher[0]).money2chntext(), 1)
+    # 规范化分数
+    pattern = re.compile(r"(\d+/\d+)")
+    matchers = pattern.findall(text)
+    if matchers:
+        #print('fraction')
+        for matcher in matchers:
+            text = text.replace(matcher, Fraction(fraction=matcher).fraction2chntext(), 1)
 
-        # 规范化固话/手机号码
-        # 手机
-        # http://www.jihaoba.com/news/show/13680
-        # 移动：139、138、137、136、135、134、159、158、157、150、151、152、188、187、182、183、184、178、198
-        # 联通：130、131、132、156、155、186、185、176
-        # 电信：133、153、189、180、181、177
-        pattern = re.compile(r"\D((\+?86 ?)?1([38]\d|5[0-35-9]|7[678]|9[89])\d{8})\D")
-        matchers = pattern.findall(text)
-        if matchers:
-            #print('telephone')
-            for matcher in matchers:
-                text = text.replace(matcher[0], TelePhone(telephone=matcher[0]).telephone2chntext(), 1)
-        # 固话
-        pattern = re.compile(r"\D((0(10|2[1-3]|[3-9]\d{2})-?)?[1-9]\d{6,7})\D")
-        matchers = pattern.findall(text)
-        if matchers:
-            # print('fixed telephone')
-            for matcher in matchers:
-                text = text.replace(matcher[0], TelePhone(telephone=matcher[0]).telephone2chntext(fixed=True), 1)
+    # 规范化百分数
+    text = text.replace('％', '%')
+    pattern = re.compile(r"(\d+(\.\d+)?%)")
+    matchers = pattern.findall(text)
+    if matchers:
+        #print('percentage')
+        for matcher in matchers:
+            text = text.replace(matcher[0], Percentage(percentage=matcher[0]).percentage2chntext(), 1)
 
-        # 规范化分数
-        pattern = re.compile(r"(\d+/\d+)")
-        matchers = pattern.findall(text)
-        if matchers:
-            #print('fraction')
-            for matcher in matchers:
-                text = text.replace(matcher, Fraction(fraction=matcher).fraction2chntext(), 1)
+    # 规范化纯数+量词
+    pattern = re.compile(r"(\d+(\.\d+)?)[多余几]?" + COM_QUANTIFIERS)
+    matchers = pattern.findall(text)
+    if matchers:
+        #print('cardinal+quantifier')
+        for matcher in matchers:
+            text = text.replace(matcher[0], Cardinal(cardinal=matcher[0]).cardinal2chntext(), 1)
 
-        # 规范化百分数
-        text = text.replace('％', '%')
-        pattern = re.compile(r"(\d+(\.\d+)?%)")
-        matchers = pattern.findall(text)
-        if matchers:
-            #print('percentage')
-            for matcher in matchers:
-                text = text.replace(matcher[0], Percentage(percentage=matcher[0]).percentage2chntext(), 1)
+    # 规范化数字编号
+    pattern = re.compile(r"(\d{4,32})")
+    matchers = pattern.findall(text)
+    if matchers:
+        #print('digit')
+        for matcher in matchers:
+            text = text.replace(matcher, Digit(digit=matcher).digit2chntext(), 1)
 
-        # 规范化纯数+量词
-        pattern = re.compile(r"(\d+(\.\d+)?)[多余几]?" + COM_QUANTIFIERS)
-        matchers = pattern.findall(text)
-        if matchers:
-            #print('cardinal+quantifier')
-            for matcher in matchers:
-                text = text.replace(matcher[0], Cardinal(cardinal=matcher[0]).cardinal2chntext(), 1)
+    # 规范化纯数
+    pattern = re.compile(r"(\d+(\.\d+)?)")
+    matchers = pattern.findall(text)
+    if matchers:
+        #print('cardinal')
+        for matcher in matchers:
+            text = text.replace(matcher[0], Cardinal(cardinal=matcher[0]).cardinal2chntext(), 1)
 
-        # 规范化数字编号
-        pattern = re.compile(r"(\d{4,32})")
-        matchers = pattern.findall(text)
-        if matchers:
-            #print('digit')
-            for matcher in matchers:
-                text = text.replace(matcher, Digit(digit=matcher).digit2chntext(), 1)
 
-        # 规范化纯数
-        pattern = re.compile(r"(\d+(\.\d+)?)")
-        matchers = pattern.findall(text)
-        if matchers:
-            #print('cardinal')
-            for matcher in matchers:
-                text = text.replace(matcher[0], Cardinal(cardinal=matcher[0]).cardinal2chntext(), 1)
+    # restore P2P, O2O, B2C, B2B etc
+    pattern = re.compile(r"(([a-zA-Z]+)二([a-zA-Z]+))")
+    matchers = pattern.findall(text)
+    if matchers:
+        # print('particular')
+        for matcher in matchers:
+            text = text.replace(matcher[0], matcher[1]+'2'+matcher[2], 1)
 
-        self.norm_text = text
-        self._particular()
-
-        return self.norm_text.lstrip('^').rstrip('$')
+    return text.lstrip('^').rstrip('$')
 
 
 def remove_erhua(text):
@@ -1095,7 +1083,7 @@ class TextNorm:
         if self.remove_erhua:
             text = remove_erhua(text)
 
-        text = NSWNormalizer(text).apply()
+        text = normalize_nsw(text)
 
         text = text.translate(PUNC_TRANSFORM)
 
@@ -1111,40 +1099,10 @@ class TextNorm:
         return text
 
 
-# ================================================================================ #
-#                            testing
-# ================================================================================ #
-
-def nsw_test_case(raw_text):
-    print('I:' + raw_text)
-    print('O:' + NSWNormalizer(raw_text).apply())
-    print('')
-
-
-def nsw_test():
-    nsw_test_case('固话：0595-23865596或23880880。')
-    nsw_test_case('固话：0595-23865596或23880880。')
-    nsw_test_case('手机：+86 19859213959或15659451527。')
-    nsw_test_case('分数：32477/76391。')
-    nsw_test_case('百分数：80.03%。')
-    nsw_test_case('编号：31520181154418。')
-    nsw_test_case('纯数：2983.07克或12345.60米。')
-    nsw_test_case('日期：1999年2月20日或09年3月15号。')
-    nsw_test_case('金钱：12块5，34.5元，20.1万')
-    nsw_test_case('特殊：O2O或B2C。')
-    nsw_test_case('3456万吨')
-    nsw_test_case('2938个')
-    nsw_test_case('938')
-    nsw_test_case('今天吃了115个小笼包231个馒头')
-    nsw_test_case('有62％的概率')
-
-
 if __name__ == '__main__':
-    #nsw_test()
-
     p = argparse.ArgumentParser()
 
-    # normalizer behaviour options
+    # normalizer options
     p.add_argument('--to_banjiao', action='store_true', help='convert quanjiao chars to banjiao')
     p.add_argument('--to_upper', action='store_true', help='convert to upper case')
     p.add_argument('--to_lower', action='store_true', help='convert to lower case')
@@ -1153,7 +1111,7 @@ if __name__ == '__main__':
     p.add_argument('--check_chars', action='store_true' , help='skip sentences containing illegal chars')
     p.add_argument('--remove_space', action='store_true' , help='remove whitespace')
 
-    # I/O
+    # I/O options
     p.add_argument('--log_interval', type=int, default=10000, help='log interval in number of processed lines')
     p.add_argument('--has_key', action='store_true', help="will be deprecated, set --format kaldi instead")
     p.add_argument('--format', type=str, choices=['text', 'kaldi', 'tsv'], default='text', help='input format')
@@ -1161,6 +1119,9 @@ if __name__ == '__main__':
     p.add_argument('ofile', help='output filename')
 
     args = p.parse_args()
+
+    if args.has_key:
+        args.format = 'kaldi'
 
     normalizer = TextNorm(
         to_banjiao = args.to_banjiao,
@@ -1172,16 +1133,11 @@ if __name__ == '__main__':
         remove_space = args.remove_space,
     )
 
+    ndone = 0
     with open(args.ifile, 'r', encoding = 'utf8') as istream, open(args.ofile, 'w+', encoding = 'utf8') as ostream:
-        ndone = 0
-
-        if args.has_key:
-            args.format = 'kaldi'
-
         if args.format == 'tsv':
             reader = csv.DictReader(istream, delimiter = '\t')
             assert('TEXT' in reader.fieldnames)
-
             print('\t'.join(reader.fieldnames), file=ostream)
 
             for item in reader:
@@ -1218,6 +1174,5 @@ if __name__ == '__main__':
                 ndone += 1
                 if ndone % args.log_interval == 0:
                     print(f'text norm: {ndone} lines done.', file = sys.stderr, flush = True)
-
-        print(f'text norm: {ndone} lines done in total.', file = sys.stderr, flush = True)
+    print(f'text norm: {ndone} lines done in total.', file = sys.stderr, flush = True)
 

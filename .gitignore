@@ -1,2 +1,5 @@
 *~
 *.far
+output_*
+log
+tmp
