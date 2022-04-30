@@ -1113,15 +1113,15 @@ if __name__ == '__main__':
 
     # I/O options
     p.add_argument('--log_interval', type=int, default=10000, help='log interval in number of processed lines')
-    p.add_argument('--has_key', action='store_true', help="will be deprecated, set --format kaldi instead")
-    p.add_argument('--format', type=str, choices=['text', 'kaldi', 'tsv'], default='text', help='input format')
+    p.add_argument('--has_key', action='store_true', help="will be deprecated, set --format ark instead")
+    p.add_argument('--format', type=str, choices=['txt', 'ark', 'tsv'], default='txt', help='input format')
     p.add_argument('ifile', help='input filename, assume utf-8 encoding')
     p.add_argument('ofile', help='output filename')
 
     args = p.parse_args()
 
     if args.has_key:
-        args.format = 'kaldi'
+        args.format = 'ark'
 
     normalizer = TextNorm(
         to_banjiao = args.to_banjiao,
@@ -1156,7 +1156,7 @@ if __name__ == '__main__':
         else:
             for l in istream:
                 key, text = '', ''
-                if args.format == 'kaldi':
+                if args.format == 'ark': # KALDI archive, line format: "key text"
                     cols = l.strip().split(maxsplit=1)
                     key, text = cols[0], cols[1] if len(cols) == 2 else ''
                 else:
@@ -1166,7 +1166,7 @@ if __name__ == '__main__':
                     text = normalizer(text)
 
                 if text:
-                    if args.format == 'kaldi':
+                    if args.format == 'ark':
                         print(key + '\t' + text, file = ostream)
                     else:
                         print(text, file = ostream)

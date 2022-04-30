@@ -1,5 +1,5 @@
 *~
 *.far
-output_*
+output*
 log
 tmp
