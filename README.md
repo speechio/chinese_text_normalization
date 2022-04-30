@@ -63,7 +63,7 @@ This project sets up a ready-to-use TN module for **Chinese**. Since my backgrou
 
 ## Supported text format
 
-1. plain text, preferably one sentence per line(most common case in ASR processing).
+1. plain text, one sentence per line(.txt)
     ```
     今天早饭吃了没
     没吃回家吃去吧
@@ -71,7 +71,7 @@ This project sets up a ready-to-use TN module for **Chinese**. Since my backgrou
     ```
     plain text is default format.
 
-2. Kaldi's transcription format
+2. Kaldi's archive format(.ark)
     ```
     KALDI_KEY_UTT001    今天早饭吃了没
     KALDI_KEY_UTT002    没吃回家吃去吧
@@ -79,7 +79,15 @@ This project sets up a ready-to-use TN module for **Chinese**. Since my backgrou
     ```
     TN will skip first column key section, normalize latter transcription text
 
-    pass `--has_key` option to switch to kaldi format.
+    pass `--format ark` option to switch to kaldi ark format.
+
+3. table format(.tsv)
+```
+    ID	AUDIO	TEXT
+    UTT01	audio/UTT01.wav	今晚8点整中央5播出2020年总决赛
+    ...
+```
+    pass `--format tsv` option, normalization will apply to `TEXT` field only.
 
 _note: All input text should be UTF-8 encoded._
 
