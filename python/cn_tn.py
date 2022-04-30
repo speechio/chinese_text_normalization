@@ -378,7 +378,8 @@ CN_CHARS = (
     '𬳵𬳶𬳽𬳿𬴂𬴃𬴊𬶋𬶍𬶏𬶐𬶟𬶠𬶨𬶭𬶮𬷕𬸘𬸚𬸣𬸦𬸪𬹼𬺈𬺓'
 )
 
-VALID_CHARS = CN_CHARS + string.ascii_letters + string.digits + ' '
+EN_CHARS = string.ascii_letters + string.digits
+VALID_CHARS = CN_CHARS + EN_CHARS + ' '
 IN_VALID_CHARS = { c : True for c in VALID_CHARS }
 
 
@@ -1048,6 +1049,25 @@ def remove_erhua(text):
     return text
 
 
+def english_token(token):
+    for c in token:
+        if c not in EN_CHARS:
+            return False
+    return True
+
+
+def remove_space(text):
+    state = True
+    tokens = []
+    for t in text.strip().split():
+        if english_token(t):
+            tokens.append(' ' + t)
+        else:
+            tokens.append(t)
+    text = ''.join(tokens)
+    return text
+
+
 class TextNorm:
     def __init__(self,
         to_banjiao:bool = False,
@@ -1094,7 +1114,7 @@ class TextNorm:
                     return ''
 
         if self.remove_space:
-            text = text.replace(' ', '')
+            text = remove_space(text)
 
         return text
 
