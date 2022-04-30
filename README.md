@@ -82,11 +82,11 @@ This project sets up a ready-to-use TN module for **Chinese**. Since my backgrou
     pass `--format ark` option to switch to kaldi ark format.
 
 3. table format(.tsv)
-```
+	```
     ID	AUDIO	TEXT
     UTT01	audio/UTT01.wav	今晚8点整中央5播出2020年总决赛
     ...
-```
+	```
 
     pass `--format tsv` option, normalization will apply to `TEXT` field only.
 
