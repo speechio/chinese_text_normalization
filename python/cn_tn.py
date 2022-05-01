@@ -168,9 +168,6 @@ QJ2BJ = {
 QJ2BJ_TRANSFORM = str.maketrans(''.join(QJ2BJ.keys()), ''.join(QJ2BJ.values()), '')
 
 
-## Character set
-EN_CHARS = string.ascii_letters + string.digits
-
 # 2013 China National Standard: https://zh.wikipedia.org/wiki/通用规范汉字表, raw resources:
 #   https://github.com/mozillazg/pinyin-data/blob/master/kMandarin_8105.txt with 8105 chinese chars in total
 CN_CHARS_COMMON_STANDARD = (
@@ -378,11 +375,15 @@ CN_CHARS_COMMON_STANDARD = (
     '𬟁𬟽𬣙𬣞𬣡𬣳𬤇𬤊𬤝𬨂𬨎𬩽𬪩𬬩𬬭𬬮𬬱𬬸𬬹𬬻𬬿𬭁𬭊𬭎𬭚𬭛𬭤𬭩𬭬𬭯𬭳𬭶𬭸𬭼𬮱𬮿𬯀𬯎𬱖𬱟'
     '𬳵𬳶𬳽𬳿𬴂𬴃𬴊𬶋𬶍𬶏𬶐𬶟𬶠𬶨𬶭𬶮𬷕𬸘𬸚𬸣𬸦𬸪𬹼𬺈𬺓'
 )
-CN_CHARS_EXT = '屌囧吶诶'
+CN_CHARS_EXT = '吶诶屌囧飚屄'
+
 CN_CHARS = CN_CHARS_COMMON_STANDARD + CN_CHARS_EXT
+IN_CH_CHARS = { c : True for c in CN_CHARS }
+
+EN_CHARS = string.ascii_letters + string.digits
+IN_EN_CHARS = { c : True for c in EN_CHARS }
 
 VALID_CHARS = CN_CHARS + EN_CHARS + ' '
-
 IN_VALID_CHARS = { c : True for c in VALID_CHARS }
 
 # ================================================================================ #
@@ -1051,23 +1052,15 @@ def remove_erhua(text):
     return text
 
 
-def english_token(token):
-    for c in token:
-        if c not in EN_CHARS:
-            return False
-    return True
-
-
 def remove_space(text):
-    state = True
-    tokens = []
-    for t in text.strip().split():
-        if english_token(t):
-            tokens.append(' ' + t)
-        else:
-            tokens.append(t)
-    text = ''.join(tokens)
-    return text
+    tokens = text.split()
+    new = []
+    for k,t in enumerate(tokens):
+        if k != 0:
+            if IN_EN_CHARS.get(tokens[k-1][-1]) and IN_EN_CHARS.get(t[0]):
+                new.append(' ')
+        new.append(t)
+    return ''.join(new)
 
 
 class TextNorm:
