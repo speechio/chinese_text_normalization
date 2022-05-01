@@ -1110,7 +1110,7 @@ class TextNorm:
         if self.check_chars:
             for c in text:
                 if not IN_VALID_CHARS.get(c):
-                    print(f'WARNING: illegal char {x} in: {text}', file=sys.stderr)
+                    print(f'WARNING: illegal char {c} in: {text}', file=sys.stderr)
                     return ''
 
         if self.remove_space:
