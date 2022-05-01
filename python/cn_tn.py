@@ -59,12 +59,12 @@ COM_QUANTIFIERS = '(匹|张|座|回|场|尾|条|个|首|阙|阵|网|炮|顶|丘|
 
 
 # Punctuation information are based on Zhon project (https://github.com/tsroten/zhon.git)
-CHINESE_PUNC_STOP = '！？｡。'
-CHINESE_PUNC_NON_STOP = '＂＃＄％＆＇（）＊＋，－／：；＜＝＞＠［＼］＾＿｀｛｜｝～｟｠｢｣､、〃《》「」『』【】〔〕〖〗〘〙〚〛〜〝〞〟〰〾〿–—‘’‛“”„‟…‧﹏·〈〉-'
-CHINESE_PUNC_LIST = CHINESE_PUNC_STOP + CHINESE_PUNC_NON_STOP
+CN_PUNCS_STOP = '！？｡。'
+CN_PUNCS_NONSTOP = '＂＃＄％＆＇（）＊＋，－／：；＜＝＞＠［＼］＾＿｀｛｜｝～｟｠｢｣､、〃《》「」『』【】〔〕〖〗〘〙〚〛〜〝〞〟〰〾〿–—‘’‛“”„‟…‧﹏·〈〉-'
+CN_PUNCS = CN_PUNCS_STOP + CN_PUNCS_NONSTOP
 
-PUNC_LIST = CHINESE_PUNC_LIST + string.punctuation
-PUNC_TRANSFORM = str.maketrans(PUNC_LIST, ' ' * len(PUNC_LIST), '') # replace puncs with space
+PUNCS = CN_PUNCS + string.punctuation
+PUNCS_TRANSFORM = str.maketrans(PUNCS, ' ' * len(PUNCS), '') # replace puncs with space
 
 
 # https://zh.wikipedia.org/wiki/全行和半行
@@ -170,7 +170,7 @@ QJ2BJ_TRANSFORM = str.maketrans(''.join(QJ2BJ.keys()), ''.join(QJ2BJ.values()), 
 
 # 2013 China National Standard: https://zh.wikipedia.org/wiki/通用规范汉字表, raw resources:
 #   https://github.com/mozillazg/pinyin-data/blob/master/kMandarin_8105.txt with 8105 chinese chars in total
-CN_CHARS_COMMON_STANDARD = (
+CN_CHARS_COMMON = (
     '一丁七万丈三上下不与丏丐丑专且丕世丘丙业丛东丝丞丢两严丧个丫中丰串临丸丹为主丽举'
     '乂乃久么义之乌乍乎乏乐乒乓乔乖乘乙乜九乞也习乡书乩买乱乳乸乾了予争事二亍于亏云互'
     '亓五井亘亚些亟亡亢交亥亦产亨亩享京亭亮亲亳亵亶亸亹人亿什仁仂仃仄仅仆仇仉今介仍从'
@@ -377,14 +377,14 @@ CN_CHARS_COMMON_STANDARD = (
 )
 CN_CHARS_EXT = '吶诶屌囧飚屄'
 
-CN_CHARS = CN_CHARS_COMMON_STANDARD + CN_CHARS_EXT
+CN_CHARS = CN_CHARS_COMMON + CN_CHARS_EXT
 IN_CH_CHARS = { c : True for c in CN_CHARS }
 
 EN_CHARS = string.ascii_letters + string.digits
 IN_EN_CHARS = { c : True for c in EN_CHARS }
 
-VALID_CHARS = CN_CHARS + EN_CHARS + ' '
-IN_VALID_CHARS = { c : True for c in VALID_CHARS }
+CHARS = CN_CHARS + EN_CHARS + ' '
+IN_VALID_CHARS = { c : True for c in CHARS }
 
 # ================================================================================ #
 #                                    basic class
@@ -1100,7 +1100,7 @@ class TextNorm:
 
         text = normalize_nsw(text)
 
-        text = text.translate(PUNC_TRANSFORM)
+        text = text.translate(PUNCS_TRANSFORM)
 
         if self.check_chars:
             for c in text:
