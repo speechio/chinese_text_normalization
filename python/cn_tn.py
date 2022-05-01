@@ -383,8 +383,8 @@ IN_CH_CHARS = { c : True for c in CN_CHARS }
 EN_CHARS = string.ascii_letters + string.digits
 IN_EN_CHARS = { c : True for c in EN_CHARS }
 
-CHARS = CN_CHARS + EN_CHARS + ' '
-IN_VALID_CHARS = { c : True for c in CHARS }
+VALID_CHARS = CN_CHARS + EN_CHARS + ' '
+IN_VALID_CHARS = { c : True for c in VALID_CHARS }
 
 # ================================================================================ #
 #                                    basic class
