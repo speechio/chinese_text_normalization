@@ -168,11 +168,12 @@ QJ2BJ = {
 QJ2BJ_TRANSFORM = str.maketrans(''.join(QJ2BJ.keys()), ''.join(QJ2BJ.values()), '')
 
 
-# 2013 China National Standard: https://zh.wikipedia.org/wiki/通用规范汉字表
-# raw resources:
-#   https://github.com/mozillazg/pinyin-data/blob/master/kMandarin_8105.txt
-#   with 8105 chinese chars in total
-CN_CHARS = (
+## Character set
+EN_CHARS = string.ascii_letters + string.digits
+
+# 2013 China National Standard: https://zh.wikipedia.org/wiki/通用规范汉字表, raw resources:
+#   https://github.com/mozillazg/pinyin-data/blob/master/kMandarin_8105.txt with 8105 chinese chars in total
+CN_CHARS_COMMON_STANDARD = (
     '一丁七万丈三上下不与丏丐丑专且丕世丘丙业丛东丝丞丢两严丧个丫中丰串临丸丹为主丽举'
     '乂乃久么义之乌乍乎乏乐乒乓乔乖乘乙乜九乞也习乡书乩买乱乳乸乾了予争事二亍于亏云互'
     '亓五井亘亚些亟亡亢交亥亦产亨亩享京亭亮亲亳亵亶亸亹人亿什仁仂仃仄仅仆仇仉今介仍从'
@@ -377,11 +378,12 @@ CN_CHARS = (
     '𬟁𬟽𬣙𬣞𬣡𬣳𬤇𬤊𬤝𬨂𬨎𬩽𬪩𬬩𬬭𬬮𬬱𬬸𬬹𬬻𬬿𬭁𬭊𬭎𬭚𬭛𬭤𬭩𬭬𬭯𬭳𬭶𬭸𬭼𬮱𬮿𬯀𬯎𬱖𬱟'
     '𬳵𬳶𬳽𬳿𬴂𬴃𬴊𬶋𬶍𬶏𬶐𬶟𬶠𬶨𬶭𬶮𬷕𬸘𬸚𬸣𬸦𬸪𬹼𬺈𬺓'
 )
+CN_CHARS_EXT = '屌囧吶诶'
+CH_CHARS = CN_CHARS_COMMON_STANDARD + CN_CHARS_EXT
 
-EN_CHARS = string.ascii_letters + string.digits
 VALID_CHARS = CN_CHARS + EN_CHARS + ' '
-IN_VALID_CHARS = { c : True for c in VALID_CHARS }
 
+IN_VALID_CHARS = { c : True for c in VALID_CHARS }
 
 # ================================================================================ #
 #                                    basic class
