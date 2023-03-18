@@ -1072,6 +1072,7 @@ class TextNorm:
         remove_erhua:bool = False,
         check_chars:bool = False,
         remove_space:bool = False,
+        cc_mode:str = '',
     ) :
         self.to_banjiao = to_banjiao
         self.to_upper = to_upper
@@ -1081,7 +1082,15 @@ class TextNorm:
         self.check_chars = check_chars
         self.remove_space = remove_space
 
+        self.cc = None
+        if cc_mode:
+            from opencc import OpenCC  # Open Chinese Convert: pip install opencc
+            self.cc = OpenCC(cc_mode)
+
     def __call__(self, text):
+        if self.cc:
+            text = self.cc.convert(text)
+
         if self.to_banjiao:
             text = text.translate(QJ2BJ_TRANSFORM)
 
@@ -1125,6 +1134,7 @@ if __name__ == '__main__':
     p.add_argument('--remove_erhua', action='store_true', help='remove erhua chars such as "他女儿在那边儿 -> 他女儿在那边"')
     p.add_argument('--check_chars', action='store_true' , help='skip sentences containing illegal chars')
     p.add_argument('--remove_space', action='store_true' , help='remove whitespace')
+    p.add_argument('--cc_mode', choices=['', 't2s', 's2t'], default='', help='convert between traditional to simplified')
 
     # I/O options
     p.add_argument('--log_interval', type=int, default=10000, help='log interval in number of processed lines')
@@ -1146,6 +1156,7 @@ if __name__ == '__main__':
         remove_erhua = args.remove_erhua,
         check_chars = args.check_chars,
         remove_space = args.remove_space,
+        cc_mode = args.cc_mode,
     )
 
     ndone = 0
